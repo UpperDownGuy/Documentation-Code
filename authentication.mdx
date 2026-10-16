@@ -1,0 +1,43 @@
+---
+title: "Authenticate requests to the AlexWeb API with keys"
+sidebarTitle: "Authentication"
+description: "Learn how to create, use, and rotate AlexWeb API keys, where to send them in each request, and what authentication errors mean when a request fails."
+---
+
+The AlexWeb API authenticates requests with API keys. This page explains how to create a key, send it with each request, and keep it secure.
+
+{/* TODO: Confirm the authentication method (API key, OAuth, etc.) and header name. */}
+
+## Create an API key
+
+1. Sign in to your AlexWeb dashboard.
+2. Open the API keys settings.
+3. Create a new key and copy it. Store it somewhere safe.
+
+## Send your key
+
+Pass the key in the `Authorization` header as a bearer token:
+
+```bash Terminal
+curl https://api.example.com/v1/YOUR_ENDPOINT \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Keep keys secure
+
+<Warning>
+  Never expose API keys in client-side code or public repositories. Rotate a key immediately if it leaks.
+</Warning>
+
+- Store keys in environment variables or a secrets manager.
+- Use separate keys for development and production.
+- Rotate keys regularly.
+
+## Authentication errors
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `401` | Missing or invalid key | Check the `Authorization` header and key value |
+| `403` | Key lacks permission | Use a key with the required access |
+
+See [Errors](/concepts/errors) for the full list.
