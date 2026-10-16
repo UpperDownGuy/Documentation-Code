@@ -38,7 +38,7 @@
           {
             "group": "API Usage",
             "pages": [
-              "base"
+              "v1/base"
             ]
           }
         ]
