@@ -1,10 +1,10 @@
 {
-  "theme": "luma",
+  "theme": "willow",
   "name": "AlexWeb",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0087D1",
+    "light": "#02A0E4",
+    "dark": "#014C9B"
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -64,5 +64,11 @@
         ]
       }
     ]
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "fonts": {
+    "family": "JetBrains Mono"
   }
 }
