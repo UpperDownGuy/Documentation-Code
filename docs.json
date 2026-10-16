@@ -32,7 +32,7 @@
           {
             "group": "Get Started",
             "pages": [
-              "welcome-to-the-alex-web-api-documentation"
+              "v1/release"
             ]
           },
           {
