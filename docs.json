@@ -25,40 +25,20 @@
     "display": "header"
   },
   "navigation": {
-    "tabs": [
+    "versions": [
       {
-        "tab": "Documentation",
+        "version": "V1",
         "groups": [
           {
             "group": "Get Started",
             "pages": [
-              "index",
-              "quickstart",
-              "authentication"
+              "welcome-to-the-alex-web-api-documentation"
             ]
           },
           {
-            "group": "Core Concepts",
+            "group": "API Usage",
             "pages": [
-              "concepts/overview",
-              "concepts/errors"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/first-integration"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "api-reference/introduction"
+              "base"
             ]
           }
         ]
