@@ -1,18 +1,18 @@
 ---
 title: "Base API"
+sidebarTitle: "Base API"
 description: "Public version 1 base endpoint, supporting routes, and error responses."
-mode: "wide"
 ---
 
-Use the Base endpoint to retrieve the API's name and version.
+Use the Base API to retrieve the API's name and version, validate messages with the echo route, and check service health. None of these routes require authentication.
 
 ## Base URL
 
-```text
+```text Base URL
 https://api.alexxweb.com
 ```
 
-The implemented version 1 path is `/api/v1`. Append the endpoint path to the base URL.
+The version 1 path is `/api/v1`. Append the endpoint path to the base URL.
 
 <Info>
   The earlier documentation used `/v1`. The current API implements `/api/v1`; serving it at `/v1` requires a gateway rewrite.
@@ -20,7 +20,20 @@ The implemented version 1 path is `/api/v1`. Append the endpoint path to the bas
 
 ## Authentication
 
-The current Base API routes do not require an API key or bearer token.
+<Check>
+  The current Base API routes do not require an API key or bearer token.
+</Check>
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | [`/api/v1`](#get-api-information) | Returns the API name and version |
+| `POST` | [`/api/v1/echo`](#echo-a-message) | Validates a message and returns it unchanged |
+| `GET` | [`/health`](#health-check) | Returns `{"status":"ok"}` when the API responds |
+| `GET` | [`/openapi.json`](#openapi-specification) | Returns the OpenAPI 3.1 specification |
+
+---
 
 ## Get API information
 
@@ -44,9 +57,9 @@ Invoke-RestMethod https://api.alexxweb.com/api/v1
 
 ### Response
 
-A successful request returns `200 OK` with:
+A successful request returns `200 OK`:
 
-```json
+```json 200 OK
 {
   "name": "base-api",
   "version": "1.0.0"
@@ -61,41 +74,89 @@ A successful request returns `200 OK` with:
   The API version. Currently `1.0.0`.
 </ResponseField>
 
-## Supporting routes
+---
 
-The small routes below support the Base API and are included on this page.
+## Echo a message
 
-| Method | Path | Result |
-| --- | --- | --- |
-| POST | `/api/v1/echo` | Validates a message and returns it unchanged |
-| GET | `/health` | Returns `{"status":"ok"}` when the API responds |
-| GET | `/openapi.json` | Returns the OpenAPI 3.1 specification |
+```http
+POST /api/v1/echo
+```
 
-### Echo example
+Send a JSON object containing only a `message` string. The API validates it and returns it unchanged.
 
-Send a JSON object containing only a `message` string:
+### Request body
 
-```bash
+<ParamField body="message" type="string" required>
+  The message to echo. Must contain 1 to 1000 JavaScript UTF-16 code units. Whitespace is preserved.
+</ParamField>
+
+<CodeGroup>
+
+```bash cURL
 curl https://api.alexxweb.com/api/v1/echo \
   -H "Content-Type: application/json" \
   -d '{"message":"hello"}'
 ```
 
-A successful response is:
+```powershell PowerShell
+Invoke-RestMethod https://api.alexxweb.com/api/v1/echo `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"message":"hello"}'
+```
 
-```json
+</CodeGroup>
+
+### Response
+
+```json 200 OK
 {
   "message": "hello"
 }
 ```
 
-The `message` must contain 1 to 1000 JavaScript UTF-16 code units; some characters, including many emoji, count as two. Whitespace is preserved. Extra properties are rejected. The total request body must not exceed 16,384 bytes. Messages are not stored.
+### Limits and validation
+
+- `message` must be 1 to 1000 UTF-16 code units. Some characters, including many emoji, count as two.
+- Extra properties are rejected.
+- The total request body must not exceed 16,384 bytes.
+- The request must use `Content-Type: application/json`.
+
+<Note>
+  Messages are not stored.
+</Note>
+
+---
+
+## Health check
+
+```http
+GET /health
+```
+
+Returns the following when the API responds:
+
+```json 200 OK
+{
+  "status": "ok"
+}
+```
+
+## OpenAPI specification
+
+```http
+GET /openapi.json
+```
+
+Returns the OpenAPI 3.1 specification for the API.
+
+---
 
 ## Errors
 
-API responses use `application/json; charset=utf-8`. Every API response includes an `X-Request-Id` header. Errors include the same ID in the body:
+API responses use `application/json; charset=utf-8`. Every API response includes an `X-Request-Id` header, and error responses include the same ID in the body:
 
-```json
+```json Error response
 {
   "error": {
     "message": "Route not found",
@@ -106,12 +167,16 @@ API responses use `application/json; charset=utf-8`. Every API response includes
 
 | Status | Cause |
 | --- | --- |
-| 400 | Invalid JSON or invalid message on the echo route |
-| 404 | Unknown path or unsupported HTTP method |
-| 413 | Echo request body exceeds 16 KiB |
-| 415 | Echo request is missing `Content-Type: application/json` or uses another content type |
-| 500 | Unexpected API error |
+| `400` | Invalid JSON or invalid message on the echo route |
+| `404` | Unknown path or unsupported HTTP method |
+| `413` | Echo request body exceeds 16 KiB |
+| `415` | Echo request is missing `Content-Type: application/json` or uses another content type |
+| `500` | Unexpected API error |
 
-Paths match exactly. For example, `/api/v1` is supported and `/api/v1/` returns 404.
+<Warning>
+  Paths match exactly. For example, `/api/v1` is supported and `/api/v1/` returns `404`.
+</Warning>
 
-A `502 Bad Gateway` response comes from the gateway when it cannot reach the API. It may not use the API's JSON error format or include an API request ID.
+<Note>
+  A `502 Bad Gateway` response comes from the gateway when it cannot reach the API. It may not use the API's JSON error format or include an API request ID.
+</Note>
