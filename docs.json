@@ -10,10 +10,6 @@
     "light": "/images/NeonCloudAPIIcon.png",
     "dark": "/images/NeonCloudAPIIcon.png"
   },
-  "favicon": {
-    "light": "/images/NeonCloudAPIIcon.png",
-    "dark": "/images/NeonCloudAPIIcon.png"
-  },
   "contextual": {
     "options": [
       "copy",
