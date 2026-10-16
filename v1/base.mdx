@@ -1,0 +1,116 @@
+---
+title: "Base API"
+description: "Public version 1 base endpoint, supporting routes, and error responses."
+---
+
+Use the Base endpoint to retrieve the API's name and version.
+
+## Base URL
+
+```text
+https://api.alexxweb.com
+```
+
+The implemented version 1 path is `/api/v1`. Append the endpoint path to the base URL.
+
+<Info>
+  The earlier documentation used `/v1`. The current API implements `/api/v1`; serving it at `/v1` requires a gateway rewrite.
+</Info>
+
+## Authentication
+
+The current Base API routes do not require an API key or bearer token.
+
+## Get API information
+
+```http
+GET /api/v1
+```
+
+No request body or query parameters are required.
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.alexxweb.com/api/v1
+```
+
+```powershell PowerShell
+Invoke-RestMethod https://api.alexxweb.com/api/v1
+```
+
+</CodeGroup>
+
+### Response
+
+A successful request returns `200 OK` with:
+
+```json
+{
+  "name": "base-api",
+  "version": "1.0.0"
+}
+```
+
+<ResponseField name="name" type="string" required>
+  The API identifier. Currently `base-api`.
+</ResponseField>
+
+<ResponseField name="version" type="string" required>
+  The API version. Currently `1.0.0`.
+</ResponseField>
+
+## Supporting routes
+
+The small routes below support the Base API and are included on this page.
+
+| Method | Path | Result |
+| --- | --- | --- |
+| POST | `/api/v1/echo` | Validates a message and returns it unchanged |
+| GET | `/health` | Returns `{"status":"ok"}` when the API responds |
+| GET | `/openapi.json` | Returns the OpenAPI 3.1 specification |
+
+### Echo example
+
+Send a JSON object containing only a `message` string:
+
+```bash
+curl https://api.alexxweb.com/api/v1/echo \
+  -H "Content-Type: application/json" \
+  -d '{"message":"hello"}'
+```
+
+A successful response is:
+
+```json
+{
+  "message": "hello"
+}
+```
+
+The `message` must contain 1 to 1000 JavaScript UTF-16 code units; some characters, including many emoji, count as two. Whitespace is preserved. Extra properties are rejected. The total request body must not exceed 16,384 bytes. Messages are not stored.
+
+## Errors
+
+API responses use `application/json; charset=utf-8`. Every API response includes an `X-Request-Id` header. Errors include the same ID in the body:
+
+```json
+{
+  "error": {
+    "message": "Route not found",
+    "requestId": "123e4567-e89b-42d3-a456-426614174000"
+  }
+}
+```
+
+| Status | Cause |
+| --- | --- |
+| 400 | Invalid JSON or invalid message on the echo route |
+| 404 | Unknown path or unsupported HTTP method |
+| 413 | Echo request body exceeds 16 KiB |
+| 415 | Echo request is missing `Content-Type: application/json` or uses another content type |
+| 500 | Unexpected API error |
+
+Paths match exactly. For example, `/api/v1` is supported and `/api/v1/` returns 404.
+
+A `502 Bad Gateway` response comes from the gateway when it cannot reach the API. It may not use the API's JSON error format or include an API request ID.
