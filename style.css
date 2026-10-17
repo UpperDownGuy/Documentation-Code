@@ -48,11 +48,12 @@ img.nav-logo {
 
 /* Desktop: move theme selector to
    bottom-left of the sidebar */
+/* Theme switcher: directly above V1 */
 @media (min-width: 1024px) {
   [data-theme-preference-switch="pill"] {
     position: fixed !important;
+    bottom: 105px !important;
     left: 60px !important;
-    bottom: 24px !important;
     z-index: 50 !important;
   }
 }
