@@ -51,19 +51,27 @@ img.nav-logo {
 /* Theme switcher: directly above V1 */
 
 /* Full-width theme switcher above V1 */
+
+/* AlexWeb - Theme switcher above V1 */
 @media (min-width: 1024px) {
   [data-theme-preference-switch="pill"] {
     position: fixed !important;
+
+    /* Center within 304px sidebar */
+    left: 7px !important;
     bottom: 84px !important;
-    left: 12px !important;
+
     width: 290px !important;
     height: 44px !important;
     max-width: none !important;
+
+    transform: none !important;
     padding: 4px !important;
     border-radius: 10px !important;
+
     display: flex !important;
-    justify-content: space-around !important;
     align-items: center !important;
+    justify-content: space-around !important;
     z-index: 50 !important;
   }
 
@@ -73,12 +81,8 @@ img.nav-logo {
     height: 36px !important;
     border-radius: 8px !important;
   }
-
-  [data-theme-preference-switch="pill"] button svg {
-    width: 18px !important;
-    height: 18px !important;
-  }
 }
+
 
 
 /* Mobile: leave theme selector
