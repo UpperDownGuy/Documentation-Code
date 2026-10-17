@@ -6,10 +6,6 @@
     "light": "#02A0E4",
     "dark": "#014C9B"
   },
-  "logo": {
-    "light": "/images/NeonCloudAPIIcon.png",
-    "dark": "/images/NeonCloudAPIIcon.png"
-  },
   "contextual": {
     "options": [
       "copy",
@@ -66,5 +62,9 @@
   "styling": {
     "eyebrows": "breadcrumbs",
     "codeblocks": "dark"
+  },
+  "favicon": {
+    "light": "/images/Untitled(3000x900px).png",
+    "dark": "/images/Untitled(3000x900px).png"
   }
 }

@@ -1,0 +1,48 @@
+/* Sidebar page links as buttons */
+#sidebar-content li > a {
+  display: flex;
+  align-items: center;
+  margin: 0.25rem 0;
+  padding: 0.5rem 0.75rem !important;
+  border: 1px solid rgba(0, 135, 209, 0.15) !important;
+  border-radius: 0.625rem !important;
+  background-color: rgba(0, 135, 209, 0.04);
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+#sidebar-content li > a::before,
+#sidebar-content li > a::after {
+  display: none !important;
+}
+
+#sidebar-content li > a:hover {
+  background-color: rgba(0, 135, 209, 0.1);
+  border-color: rgba(0, 135, 209, 0.35) !important;
+  transform: translateX(2px);
+}
+
+#sidebar-content li[data-active] > a {
+  background-color: #0087D1 !important;
+  border-color: #0087D1 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+#sidebar-content li[data-active] > a * {
+  color: #ffffff !important;
+}
+
+/* Previous / next links at the bottom of pages as buttons */
+.pagination-prev,
+.pagination-next {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(0, 135, 209, 0.25);
+  border-radius: 0.75rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pagination-prev:hover,
+.pagination-next:hover {
+  background-color: rgba(0, 135, 209, 0.08);
+  border-color: #0087D1;
+}
