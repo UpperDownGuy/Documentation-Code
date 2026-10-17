@@ -31,15 +31,40 @@
 }
 
 /* AlexWeb documentation navbar logo */
-/* Larger AlexWeb navbar logo */
+
+/* ===================================
+   ALEXWEB DOCUMENTATION - NAVBAR
+   =================================== */
+
+/* Enlarge navbar logo */
 img.nav-logo {
-  height: 40px !important;
-  max-height: 40px !important;
-  max-width: 250px !important;
+  height: 44px !important;
+  max-height: 44px !important;
+  max-width: 260px !important;
   width: auto !important;
   padding: 0 !important;
   object-fit: contain !important;
 }
+
+/* Desktop: move theme selector to
+   bottom-left of the sidebar */
+@media (min-width: 1024px) {
+  [data-theme-preference-switch="pill"] {
+    position: fixed !important;
+    left: 60px !important;
+    bottom: 24px !important;
+    z-index: 50 !important;
+  }
+}
+
+/* Mobile: leave theme selector
+   in its normal location */
+@media (max-width: 1023px) {
+  [data-theme-preference-switch="pill"] {
+    position: relative !important;
+  }
+}
+
 
 /* Increase the navbar logo size */
 #navbar img {
