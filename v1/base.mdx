@@ -8,7 +8,15 @@ The Base API shows the API's name and current version.
 
 ## Try it
 
-Open [https://api.alexxweb.com/api/v1](https://api.alexxweb.com/api/v1) in your browser.
+Open [https://api.alexxweb.com/api/v1](https://api.alexxweb.com/api/v1) in your browser, or run:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/
+```
+
+</CodeGroup>
 
 You do not need to log in or provide an API key.
 
@@ -16,7 +24,7 @@ You do not need to log in or provide an API key.
 
 ```json
 {
-  "name": "base-api",
+  "name": "AlexWeb API",
   "version": "1.0.0"
 }
 ```
@@ -25,37 +33,3 @@ You do not need to log in or provide an API key.
 - **version** is the current API version.
 
 This request only reads information. It does not change anything.
-
-## POST requests
-
-```powershell
-POST /api/v1/echo
-```
-
-Usage:
-
-<CodeGroup>
-
-```powershell CURL
-curl https://api.alexxweb.com/api/v1/echo \
-  -H "Content-Type: application/json" \
-  -d '{"message":"hello"}'
-```
-
-</CodeGroup>
-
-Response:
-
-```json
-{
-  "message": "hello"
-}
-```
-
-Body:
-
-```json
-{
-  "message": "hello"
-}
-```

@@ -33,7 +33,8 @@
           {
             "group": "API Usage",
             "pages": [
-              "v1/base"
+              "v1/base",
+              "echo-endpoint"
             ]
           }
         ]

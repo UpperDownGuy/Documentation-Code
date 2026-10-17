@@ -1,0 +1,37 @@
+---
+title: "Echo Endpoint"
+---
+
+Endpoint:
+
+```powershell
+POST /api/v1/echo
+```
+
+Usage:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/echo \
+  -H "Content-Type: application/json" \
+  -d '{"message":"hello"}'
+```
+
+</CodeGroup>
+
+Response:
+
+```json
+{
+  "message": "hello"
+}
+```
+
+Body:
+
+```json
+{
+  "message": "hello"
+}
+```
