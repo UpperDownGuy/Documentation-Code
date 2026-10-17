@@ -64,11 +64,11 @@
     "codeblocks": "dark"
   },
   "favicon": {
-    "light": "/images/Favicon.png",
-    "dark": "/images/Favicon.png"
-  },
-  "logo": {
     "light": "/images/Icon.png",
     "dark": "/images/Icon.png"
+  },
+  "logo": {
+    "light": "/images/Favicon.png",
+    "dark": "/images/Favicon.png"
   }
 }
