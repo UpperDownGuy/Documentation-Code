@@ -31,12 +31,14 @@
 }
 
 /* AlexWeb documentation navbar logo */
+/* Larger AlexWeb navbar logo */
 img.nav-logo {
-  height: 36px !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  max-width: 250px !important;
   width: auto !important;
-  max-width: min(100%, 240px) !important;
-  object-fit: contain !important;
   padding: 0 !important;
+  object-fit: contain !important;
 }
 
 /* Increase the navbar logo size */
