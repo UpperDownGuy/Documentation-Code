@@ -60,12 +60,11 @@
     "decoration": "gradient"
   },
   "styling": {
-    "eyebrows": "breadcrumbs",
-    "codeblocks": "dark"
+    "eyebrows": "breadcrumbs"
   },
-  "favicon": "/images/Favicon.png",
+  "favicon": "/images/Icon.png",
   "logo": {
-    "light": "/images/Icon.png",
-    "dark": "/images/Icon.png"
+    "light": "/images/Favicon.png",
+    "dark": "/images/Favicon.png"
   }
 }
