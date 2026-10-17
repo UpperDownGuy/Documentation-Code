@@ -49,14 +49,37 @@ img.nav-logo {
 /* Desktop: move theme selector to
    bottom-left of the sidebar */
 /* Theme switcher: directly above V1 */
+
+/* Full-width theme switcher above V1 */
 @media (min-width: 1024px) {
   [data-theme-preference-switch="pill"] {
     position: fixed !important;
-    bottom: 105px !important;
-    left: 60px !important;
+    bottom: 84px !important;
+    left: 12px !important;
+    width: 290px !important;
+    height: 44px !important;
+    max-width: none !important;
+    padding: 4px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
     z-index: 50 !important;
   }
+
+  [data-theme-preference-switch="pill"] button {
+    flex: 1 1 0% !important;
+    width: auto !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+  }
+
+  [data-theme-preference-switch="pill"] button svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
+
 
 /* Mobile: leave theme selector
    in its normal location */
