@@ -30,6 +30,16 @@
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
+/* AlexWeb documentation navbar logo */
+img.nav-logo {
+  height: 42px !important;
+  max-height: none !important;
+  max-width: 420px !important;
+  width: auto !important;
+  padding: 0 !important;
+  object-fit: contain !important;
+}
+
 /* Increase the navbar logo size */
 #navbar img {
   height: 48px !important;
