@@ -30,9 +30,13 @@
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
+/* Increase the navbar logo size */
 #navbar img {
-  max-height: 40px !important;
+  height: 48px !important;
+  max-height: 48px !important;
   width: auto !important;
+  max-width: none !important;
+  object-fit: contain;
 }
 
 
