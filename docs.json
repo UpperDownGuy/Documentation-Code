@@ -65,6 +65,6 @@
   "favicon": "/images/Icon.png",
   "logo": {
     "light": "/images/Favicon.svg",
-    "dark": "/images/Favicon.svg"
+    "dark": "/images/Favicon-Dark.svg"
   }
 }
