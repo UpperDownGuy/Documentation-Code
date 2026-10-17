@@ -64,6 +64,10 @@
     "codeblocks": "dark"
   },
   "favicon": {
+    "light": "/images/NeonCloudAPIIcon.png",
+    "dark": "/images/NeonCloudAPIIcon.png"
+  },
+  "logo": {
     "light": "/images/Untitled(3000x900px).png",
     "dark": "/images/Untitled(3000x900px).png"
   }
