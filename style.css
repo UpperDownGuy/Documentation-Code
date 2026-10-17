@@ -30,6 +30,12 @@
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
+#navbar img {
+  max-height: 40px !important;
+  width: auto !important;
+}
+
+
 #sidebar-content li a:hover {
   background-color: rgba(0, 135, 209, 0.12) !important;
   border-color: rgba(0, 135, 209, 0.4) !important;
