@@ -64,7 +64,7 @@
   },
   "favicon": "/images/Icon.png",
   "logo": {
-    "light": "/images/Favicon.png",
-    "dark": "/images/Favicon.png"
+    "light": "/images/Favicon.svg",
+    "dark": "/images/Favicon.svg"
   }
 }
