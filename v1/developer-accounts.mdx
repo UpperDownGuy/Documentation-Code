@@ -1,0 +1,129 @@
+---
+title: "Developer Accounts"
+sidebarTitle: "Developer Accounts"
+description: "Create your AlexWeb account, manage API access, and understand your usage allowance."
+icon: "users"
+---
+
+<div className="aw-doc-hero">
+  <span className="aw-doc-eyebrow">Start building with AlexWeb</span>
+  <p className="aw-doc-hero-title">One account. Your own data.</p>
+  <p className="aw-doc-hero-copy">Create an account in the developer console, make a key for your app, and keep track of your requests in one place.</p>
+  <div className="aw-doc-actions">
+    <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/developers">Open developer console</a>
+    <a className="aw-doc-button" href="#create-an-account">See the setup steps</a>
+  </div>
+</div>
+
+Anyone can read AlexWeb's public service information. A developer account gives you a private area for your own resources, events, API keys, OAuth applications, webhooks, schedules, and usage history.
+
+The **developer console** is the website for managing that access. Your apps connect to the API using an API key or OAuth token. They do not need your console password.
+
+## Create an account
+
+<Steps>
+  <Step title="Open the console">
+    Visit [api.alexxweb.com/developers](https://api.alexxweb.com/developers) and choose the account creation option.
+  </Step>
+  <Step title="Choose a username and password">
+    Use a username with 3–32 letters, digits, underscores, or hyphens. Usernames are case-insensitive: `MyApp` and `myapp` refer to the same username. Choose a password between 12 and 128 characters. A display name is optional, and no email address is required.
+  </Step>
+  <Step title="Create a key for your app">
+    After signing in, open API key management. Give the key a recognizable name, select its permissions and expiry, then save the returned secret privately. See [API Keys](/v1/api-keys) for the available permissions.
+  </Step>
+  <Step title="Make your first request">
+    Use the key to check your identity, then [create a resource](/v1/resources). Your new account starts with its own data; examples in the docs do not create resources until you send them.
+  </Step>
+</Steps>
+
+If the username is already used, choose another one. Registration may return **503** when new account creation is unavailable or the service's account capacity has been reached. That does not give you access to an existing account.
+
+## Sign in later
+
+Open the console and enter the same username and password. A successful login opens a browser session lasting up to **12 hours**. When it expires, sign in again. The account supports up to ten browser sessions; starting another session after reaching that number ends the oldest one.
+
+The console also supports connecting with an existing API key. This is useful for an existing account or for a key that has access to only part of an account. The console's available operations follow that credential's permissions: a read-only key does not become a management key simply because you use it in a browser.
+
+<CardGroup cols={2}>
+  <Card title="Developer account login" icon="user-round">
+    Use your username and password to manage your account in the browser. Keep the password private.
+  </Card>
+  <Card title="API key connection" icon="key">
+    Use an existing key to access the API operations granted by that key's scopes.
+  </Card>
+</CardGroup>
+
+## What you can manage
+
+| Console area | What you can do |
+| --- | --- |
+| **API keys** | Create a separate key for each app, inspect permissions and expiry, rotate a key, or revoke it. |
+| **OAuth applications** | Register an application, view its client identity, replace a confidential app's secret, or delete it. |
+| **Usage** | Review request traffic, response status, errors, and server response times. |
+| **Service status** | Check public readiness, uptime, and a browser response-time measurement. |
+| **Account settings** | Change your password and end your current browser session. |
+
+Creating or rotating a secret shows the new value once. A list of keys or applications shows their identifiers and metadata; it cannot reveal an existing secret.
+
+## Keep your apps separate
+
+Your account's resources, events, applications, keys, and usage belong to your account. A key from another account does not give you access to them. When an app connects through OAuth, it accesses the data belonging to the account that approved it.
+
+Use a dedicated key for each app or integration. For example:
+
+| App | Typical permissions |
+| --- | --- |
+| A dashboard that displays stored values | `resources:read` |
+| A service that updates a sensor | `resources:write` |
+| A service reacting to events | `events:read` |
+| Home Assistant with sensors only | `resources:read`, `events:read`, `integrations:read` |
+| Home Assistant with switch and text controls | The three Home Assistant read scopes, plus `resources:write` |
+
+Management permissions such as `keys:manage` and `apps:manage` allow changes to credentials and registered applications. Give them to tools that need to manage access.
+
+## Understand your allowance
+
+New developer accounts have an allowance of **10,000 authenticated API requests per day**, shared across the account's credentials. Creating another key does not create another daily allowance.
+
+The daily allowance resets at **midnight UTC**. Each API credential also has a **120 request per minute** limit. Public requests have a separate **60 request per minute per IP address** limit; the legacy `/health` liveness route is exempt. Use [Usage & Limits](/v1/usage) for response headers and retry behavior.
+
+An API response with HTTP **429** means a request allowance has been reached. Follow `Retry-After` instead of retrying continuously. A larger number of keys does not bypass the account allowance.
+
+The console's usage view shows recorded requests for your account. Those statistics are useful for deciding whether your app should cache a value, poll less often, or use [events](/v1/events) to react to changes.
+
+## Change your password
+
+Use the password change form in account settings. Enter your current password and a new password between 12 and 128 characters. A successful change ends your other browser sessions, so other browsers need to sign in again.
+
+There is currently no email-based password reset flow. Store your password in a password manager so you can retrieve it later. API keys and client secrets are separate credentials; manage their access in the keys and applications areas.
+
+## Sign out
+
+Use **Sign out** in the console to end the current browser session. Closing a tab alone does not immediately expire a browser session. On a shared computer, sign out before leaving it.
+
+An API key copied into an app remains usable until it expires, is rotated, or is revoked. Signing out of the console does not replace the need to revoke an app's key when you want to remove that app's access.
+
+## Browser session security
+
+The console uses a session cookie. The hosted service marks it **HttpOnly**, **Secure**, and **SameSite=Strict**. HttpOnly means ordinary page JavaScript cannot read the session cookie; Secure restricts it to HTTPS; SameSite=Strict limits when browsers attach it to requests initiated from other sites.
+
+Requests that change account data also use a CSRF token and same-origin checks. The console handles these checks automatically. You do not need to copy session cookies or CSRF values into your apps. Use [API keys](/v1/api-keys) for your own service, or [OAuth](/v1/oauth) when another app should ask for permission.
+
+## Console API routes
+
+These endpoints support the console. Signup and login accept JSON. Requests that use or change a session rely on that browser's cookie; state-changing session requests also require the console's CSRF handling.
+
+| Request | Purpose |
+| --- | --- |
+| `POST /api/v1/developer/signup` | Creates an account with `username`, `password`, and optional `displayName`. |
+| `POST /api/v1/developer/login` | Starts a browser session with `username` and `password`. |
+| `GET /api/v1/developer/session` | Reads the current browser session and account allowance. |
+| `POST /api/v1/developer/logout` | Ends the current browser session. |
+| `POST /api/v1/developer/password` | Changes the password using `currentPassword` and `newPassword`. |
+
+These are browser account-management routes. The interactive API panels elsewhere in the docs use API credentials, so they do not require your console password.
+
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/developers">Create or manage an account</a>
+  <a className="aw-doc-button" href="/v1/resources">Build with resources</a>
+</div>

@@ -1,0 +1,127 @@
+---
+title: "Health & Status"
+sidebarTitle: "Health & Status"
+description: "Check whether AlexWeb is ready, read its uptime, and measure response time."
+icon: "activity"
+openapi: "GET /api/v1/status"
+playground: "interactive"
+---
+
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">Service monitoring</span>
+  <p>Use health checks to decide whether a service can handle work. Use status to understand its readiness and uptime at the time of your request.</p>
+</div>
+
+These requests are public. They do not require an API key, and the responses contain no private account data or internal infrastructure addresses.
+
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/api/v1/status">Open live status</a>
+  <a className="aw-doc-button" href="https://api.alexxweb.com/developers">Open developer console</a>
+</div>
+
+## Try it
+
+Send the request in this page's interactive panel, or use cURL:
+
+<CodeGroup>
+
+```powershell cURL
+curl -i https://api.alexxweb.com/api/v1/status
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.alexxweb.com/api/v1/status");
+const status = await response.json();
+console.log(response.status, status.status);
+```
+
+</CodeGroup>
+
+## What you'll see
+
+This is an illustrative response; uptime and timings change with each request.
+
+```json
+{
+  "service": "AlexWeb API",
+  "version": "1.2.0",
+  "status": "operational",
+  "uptime_seconds": 86400,
+  "timestamp": "2026-10-18T12:00:00.000Z",
+  "checks": {
+    "storage": {
+      "status": "ok",
+      "latency_ms": 0.45
+    }
+  }
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `service` | The service name, **AlexWeb API**. |
+| `version` | The software version serving the request. |
+| `status` | `operational` when storage is ready; `degraded` when it is unavailable. |
+| `uptime_seconds` | Seconds since this API process started. A restart resets this number. |
+| `timestamp` | The time of this check in UTC. |
+| `checks.storage.status` | Whether a lightweight storage read succeeded. |
+| `checks.storage.latency_ms` | Time spent on that storage check, in milliseconds. |
+
+The status response checks the API process and its storage. It does not test every webhook receiver, OAuth callback, or connected Home Assistant instance.
+
+## Health checks
+
+<CardGroup cols={2}>
+  <Card title="Readiness" icon="circle-check">
+    `GET /api/v1/health` verifies a storage read. Use this when deciding whether the API is ready to serve requests.
+  </Card>
+  <Card title="Liveness" icon="heart-pulse">
+    `GET /health` confirms that the API process can answer HTTP. It remains available for existing monitors.
+  </Card>
+</CardGroup>
+
+A successful readiness response is:
+
+```json
+{ "status": "ok" }
+```
+
+If the storage check fails, `/api/v1/health` returns HTTP **503** and:
+
+```json
+{ "status": "unavailable" }
+```
+
+`/api/v1/status` also returns **503** when degraded. Use the HTTP status code in your monitor, and inspect the JSON to understand the result. A liveness response alone does not prove storage is ready.
+
+## Understand the timing
+
+**Storage latency** is one small operation inside the API. It excludes the time spent reaching the service over the internet.
+
+**Client response time** includes the network path and the time it takes to receive a response. You can measure it with cURL:
+
+```bash
+curl -s -o /dev/null -w 'HTTP %{http_code}; total %{time_total}s\n' https://api.alexxweb.com/api/v1/status
+```
+
+The developer console displays a browser measurement when it loads status. Your account's [usage analytics](/v1/usage) measures server response time for authenticated requests. These measure different parts of a request and should not be expected to match.
+
+## Use it in a monitor
+
+1. Point your monitor at `https://api.alexxweb.com/api/v1/health`.
+2. Treat HTTP **200** as ready and **503** as unavailable.
+3. Use a reasonable interval, such as once per minute, and confirm repeated failures before alerting.
+4. Keep the `X-Request-Id` header from failed checks when requesting help.
+
+Status and health are point-in-time checks. This API does not promise a historical uptime percentage or a service-level agreement.
+
+## Other requests
+
+| Request | Purpose |
+| --- | --- |
+| `GET /health` | Process liveness, compatible with existing monitors. |
+| `GET /api/v1/health` | Storage readiness. |
+| `GET /api/v1/status` | Readiness, uptime, version, and storage timing. |
+| `GET /api/v1/capabilities` | Supported features and configured limits. |
+
+For request counts, error rates, and latency statistics belonging to your account, use [Usage & Limits](/v1/usage).

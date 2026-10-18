@@ -2,11 +2,24 @@
 title: "API Keys"
 sidebarTitle: "API Keys"
 description: "Create a key and give your app access to the API."
+icon: "key"
+openapi: "GET /api/v1/auth/me"
+playground: "interactive"
 ---
+
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">Account access</span>
+  <p>Check your credential, then create a separate key for each app.</p>
+</div>
+
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/developers">Manage keys</a>
+  <a className="aw-doc-button" href="#permissions">Permissions</a>
+</div>
 
 An API key lets your app read or change AlexWeb data. Each key has permissions called **scopes**.
 
-Get your first key privately from the API owner. Never put it in a public website or a URL.
+[Create a developer account](/v1/developer-accounts), sign in to the [developer console](https://api.alexxweb.com/developers), and create a key for your app. Existing API users can also connect to the console with a key. Never put a key in a public website or a URL.
 
 ## Try it
 
@@ -24,13 +37,13 @@ curl https://api.alexxweb.com/api/v1/auth/me -H "Authorization: Bearer YOUR_API_
 
 ```json
 {
-  "account": { "id": "ACCOUNT_ID", "name": "AlexWeb" },
+  "account": { "id": "ACCOUNT_ID", "username": "your_username", "name": "Your account" },
   "credential": {
     "id": "KEY_ID",
     "kind": "api_key",
     "scopes": ["resources:read", "events:read"]
   },
-  "api": { "name": "AlexWeb API", "version": "1.1.0" }
+  "api": { "name": "AlexWeb API", "version": "1.2.0" }
 }
 ```
 
@@ -51,7 +64,7 @@ curl https://api.alexxweb.com/api/v1/keys -H "Authorization: Bearer YOUR_API_KEY
 
 </CodeGroup>
 
-Save the response's **key** privately. It is shown once. `expiresInDays` is optional and defaults to 90 days; it accepts 1–365. A new key cannot outlive the credential creating it.
+Save the response's **key** privately. It is shown once. `expiresInDays` is optional and defaults to 90 days; it accepts 1–365. A key created by another API key cannot outlive that creating key. Keys created from your developer account's console session can use the selected lifetime; they are not limited to the browser session's 12 hours.
 
 ## Other requests
 
@@ -60,7 +73,25 @@ Save the response's **key** privately. It is shown once. `expiresInDays` is opti
 | `GET /api/v1/auth/me` | Checks your key or OAuth token. | Any valid credential |
 | `GET /api/v1/keys` | Lists key names, permissions and expiry dates. | `keys:manage` |
 | `POST /api/v1/keys` | Creates a key. | `keys:manage` |
+| `POST /api/v1/keys/{id}/rotate` | Replaces a key with the same permissions and remaining expiry. | `keys:manage` |
 | `DELETE /api/v1/keys/{id}` | Revokes a key immediately. | `keys:manage` |
+
+## Rotate or revoke a key
+
+**Rotate** replaces a key when an app needs a fresh credential. In the developer console, choose the key and use its rotation action. The API revokes the previous key and returns a new key in one operation. Save the new **key** value immediately; it is shown once.
+
+```bash
+curl -X POST https://api.alexxweb.com/api/v1/keys/KEY_ID/rotate \
+  -H "Authorization: Bearer YOUR_MANAGEMENT_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+The replacement keeps the original key's permissions. It preserves the remaining expiry or shortens it to the management credential's expiry when that expires sooner. Rotation does not extend the key's lifetime or grant additional permissions. Your management credential must also be allowed to grant all the original key's scopes.
+
+Update the app using that key with the new value. For [Home Assistant](/v1/home-assistant#replace-credentials-or-reconnect), follow the credential replacement steps after rotation. Work authorized by the old key, including its OAuth grants, webhooks, or schedules, loses that authorization when the old key is revoked; reconnect or recreate those connections with a current credential as needed.
+
+**Revoke** ends a key's access without creating a replacement. Use it when an app should no longer connect. The list shows metadata such as the key's identifier, name, scopes, and expiry; it cannot recover the full secret of an existing key.
 
 ## Permissions
 

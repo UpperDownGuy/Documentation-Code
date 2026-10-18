@@ -9,6 +9,7 @@
   "contextual": {
     "options": [
       "copy",
+      "download-spec",
       "view",
       "chatgpt",
       "claude",
@@ -20,30 +21,37 @@
     "display": "header"
   },
   "navigation": {
-    "versions": [
+    "languages": [
       {
-        "version": "V1",
-        "groups": [
+        "language": "en",
+        "versions": [
           {
-            "group": "Get Started",
-            "pages": [
-              "v1/release"
-            ]
-          },
-          {
-            "group": "API Usage",
-            "pages": [
-              "v1/base",
-              "echo-endpoint",
-              "v1/api-keys",
-              "v1/oauth",
-              "v1/applications",
-              "v1/resources",
-              "v1/events",
-              "v1/webhooks",
-              "v1/schedules",
-              "v1/usage",
-              "v1/home-assistant"
+            "version": "V1",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "v1/developer-accounts",
+                  "v1/release"
+                ]
+              },
+              {
+                "group": "API Usage",
+                "pages": [
+                  "v1/base",
+                  "v1/status",
+                  "echo-endpoint",
+                  "v1/api-keys",
+                  "v1/oauth",
+                  "v1/applications",
+                  "v1/resources",
+                  "v1/events",
+                  "v1/webhooks",
+                  "v1/schedules",
+                  "v1/usage",
+                  "v1/home-assistant"
+                ]
+              }
             ]
           }
         ]
@@ -76,5 +84,41 @@
   "logo": {
     "light": "/images/Favicon.svg",
     "dark": "/images/Favicon-Dark.svg"
+  },
+  "description": "Build with AlexWeb API: resources, live events, OAuth, API keys, webhooks, schedules, and Home Assistant. Complete guides and interactive requests.",
+  "api": {
+    "openapi": "https://api.alexxweb.com/openapi.json",
+    "params": {
+      "expanded": "closed"
+    },
+    "playground": {
+      "display": "interactive",
+      "proxy": true
+    },
+    "examples": {
+      "defaults": "required",
+      "languages": [
+        "curl",
+        "javascript",
+        "python"
+      ],
+      "prefill": true
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "href": "https://api.alexxweb.com/api/v1/status",
+        "label": "API status"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Developer console",
+      "href": "https://api.alexxweb.com/developers"
+    }
+  },
+  "search": {
+    "prompt": "Search requests, setup, and examples..."
   }
 }

@@ -2,7 +2,20 @@
 title: "Events"
 sidebarTitle: "Events"
 description: "Read changes and send your own events."
+icon: "radio"
+openapi: "GET /api/v1/events"
+playground: "interactive"
 ---
+
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">Changes as they happen</span>
+  <p>Read an event history, listen live, or publish your own app events.</p>
+</div>
+
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="#listen-live">Listen live</a>
+  <a className="aw-doc-button" href="/v1/webhooks">Set up a webhook</a>
+</div>
 
 Events tell apps what changed. Resource updates create events automatically, and your app can send its own.
 

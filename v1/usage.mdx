@@ -2,11 +2,24 @@
 title: "Usage & Limits"
 sidebarTitle: "Usage & Limits"
 description: "Check requests, recent changes and API limits."
+icon: "chart-no-axes-combined"
+openapi: "GET /api/v1/usage"
+playground: "interactive"
 ---
 
-Usage shows how your account uses the API. Audit history shows which changes were made.
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">Account observability</span>
+  <p>Understand request traffic, errors, response time, and recent changes.</p>
+</div>
 
-Both requests need `usage:read`.
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/developers">Open usage dashboard</a>
+  <a className="aw-doc-button" href="#api-limits">Review API limits</a>
+</div>
+
+Usage shows how your account uses the API, including request counts, response times, and error rates. Audit history shows which changes were made.
+
+Both requests need `usage:read`. You can use the [developer console](https://api.alexxweb.com/developers) to view these statistics without building your own dashboard.
 
 ## Try it
 
@@ -24,6 +37,43 @@ Request counts are grouped by **day**, **route**, **status** and **credential ID
 
 Audit records include the action, time, target and credential ID. Keys, tokens and signing secrets are not included.
 
+## Read the dashboard
+
+The developer console shows the selected account's request traffic, errors, response time, and breakdown by route. Connect using an API key with `usage:read`; the console only shows data that key is allowed to read.
+
+The API response includes these summary fields:
+
+| Field | Meaning |
+| --- | --- |
+| `totalRequests` | All recorded authenticated requests in the chosen period. |
+| `clientErrors` | Recorded responses with an HTTP status from 400 to 499. |
+| `serverErrors` | Recorded responses with an HTTP status from 500 to 599. |
+| `errorRatePercent` | `(clientErrors + serverErrors) / totalRequests × 100`; zero when no requests are recorded. |
+| `responseTimeMs.average` | Mean server response time for requests that have a timing sample. |
+| `responseTimeMs.p95` | Estimated 95th percentile of those samples. |
+| `responseTimeMs.max` | Longest sampled response time. |
+| `responseTimeMs.samples` | Number of requests included in the timing statistics. |
+
+**Response time is measured on the server, from the start of handling a request until response headers are sent.** It does not include the complete network trip from your device to AlexWeb or the time spent downloading the response body. For a live event stream, the measurement covers establishing the stream; it does not wait for the connection to close or count the full stream lifetime.
+
+The API stores latency in bounded histogram buckets. `p95IsEstimate` is always `true`: the reported p95 is an estimate from those buckets, rather than the exact duration of an individual request. The `latencyHistogram` object contains the bucket boundaries and counts if you want to build your own chart.
+
+Requests recorded before response timing was introduced still count toward traffic totals. They have no historical timing samples, so `samples` may be lower than `totalRequests`. With no timing samples, `average`, `p95`, and `max` are `null` rather than zero. Timing values above one day are capped at one day.
+
+Public requests and requests that cannot be attributed to a valid account credential are not part of an account's usage report. Requests are recorded when their response headers are sent. An open event stream therefore counts without waiting for it to close. A usage report is calculated before its own response is recorded, so that request can appear in the next refresh.
+
+## Inspect a route or credential
+
+Every entry in **data** identifies a day, credential ID, HTTP method, normalized route, response status, and request total. Each entry also includes timing totals, sample count, maximum duration, and its own `responseTimeMs` summary.
+
+Use these entries to spot a route producing repeated **403** responses, a key sending unusually many requests, or an operation taking longer than expected. A credential ID identifies the key or token without exposing its secret value.
+
+## Review recent changes
+
+`GET /api/v1/audit` lists recent account actions. For example, a resource update records who made the change and which resource changed. Creating, rotating, or revoking credentials also leaves an audit entry. The API retains the latest 5,000 audit records per account.
+
+Use the returned `requestId` and the response's `X-Request-Id` when investigating a specific request. Audit history is an activity record; it does not contain request bodies or allow a change to be undone.
+
 ## Other requests
 
 | Request | What it does |
@@ -36,6 +86,7 @@ Audit records include the action, time, target and credential ID. Keys, tokens a
 | Limit | Amount |
 | --- | --- |
 | Authenticated requests | 120 per minute, per credential. |
+| Registered developer account requests | 10,000 authenticated requests per day, shared across the account. |
 | Public requests | 60 per minute, per IP address. |
 | JSON request body | 16 KiB. |
 | Default list size | 25 items; events default to 100. |
@@ -46,6 +97,8 @@ Audit records include the action, time, target and credential ID. Keys, tokens a
 List requests accept `limit` and `offset`. Responses contain **data** and **pagination**, including **total** and **hasMore**. [Events](/v1/events) use a cursor instead.
 
 If you reach the request limit, the API returns **429**. Wait for the number of seconds in the `Retry-After` header before retrying. Rate limit headers show the current allowance.
+
+Daily account allowances apply to newly registered [developer accounts](/v1/developer-accounts). All of that account's API keys and OAuth access share the allowance. The existing owner account may have a different allowance. Request counts and account quotas are separate from the per-credential minute limit.
 
 ## If a request fails
 

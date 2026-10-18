@@ -2,7 +2,20 @@
 title: "Webhooks"
 sidebarTitle: "Webhooks"
 description: "Have the API send events to your app."
+icon: "webhook"
+openapi: "GET /api/v1/webhooks"
+playground: "interactive"
 ---
+
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">Deliver events to your app</span>
+  <p>Receive signed event requests on your public HTTPS endpoint.</p>
+</div>
+
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="#try-it">Create a webhook</a>
+  <a className="aw-doc-button" href="#receiving-events">Check signatures</a>
+</div>
 
 A webhook sends an HTTP request to your app when a matching event happens. Your app needs a public HTTPS endpoint to receive it.
 

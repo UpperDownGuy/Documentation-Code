@@ -2,7 +2,39 @@
 title: "Home Assistant"
 sidebarTitle: "Home Assistant"
 description: "Install AlexWeb API in Home Assistant, connect your account, and use resources and events in automations."
+icon: "house"
+openapi: "GET /api/v1/integrations/home-assistant/manifest"
+playground: "interactive"
 ---
+
+<div className="aw-doc-hero">
+  <span className="aw-doc-eyebrow">AlexWeb + Home Assistant</span>
+  <p className="aw-doc-hero-title">Your data. In your home.</p>
+  <p className="aw-doc-hero-copy">Bring AlexWeb sensors, switches, text values, and events into Home Assistant. Follow the complete installation guide, then build your first automation.</p>
+
+  <div className="aw-doc-actions">
+    <a className="aw-doc-button aw-doc-button-primary" href="#install-the-integration">Install the integration</a>
+    <a className="aw-doc-button" href="#connect-with-an-api-key">Connect with an API key</a>
+  </div>
+</div>
+
+<CardGroup cols={2}>
+  <Card title="Choose your connection" icon="key" href="#choose-how-to-connect">
+    Compare API keys with OAuth and understand the permissions you need.
+  </Card>
+
+  <Card title="Build an automation" icon="workflow" href="#use-api-events-in-an-automation">
+    Publish an event, inspect its data, and react to it in Home Assistant.
+  </Card>
+
+  <Card title="Create useful entities" icon="database" href="#create-your-first-resources">
+    Add a temperature sensor, on/off setting, or status message.
+  </Card>
+
+  <Card title="Find a fix" icon="wrench" href="#troubleshooting">
+    Resolve connection, permission, update, and entity problems.
+  </Card>
+</CardGroup>
 
 The **AlexWeb API** integration puts data from your AlexWeb account into Home Assistant. A resource becomes an entity you can display on a dashboard or use in an automation. API events also arrive on Home Assistant's event bus.
 
@@ -22,7 +54,7 @@ You need:
 
 You do not need to expose your Home Assistant server to the internet to use an API key. Home Assistant connects out to AlexWeb. This is a custom integration installed manually; these instructions do not require a HACS repository.
 
-The Home Assistant integration version, **1.0.0**, and the AlexWeb API version, **1.1.0**, are separate version numbers.
+The Home Assistant integration version, **1.0.0**, and the AlexWeb API version, **1.2.0**, are separate version numbers.
 
 ## Install the integration
 
@@ -87,7 +119,7 @@ For read-only access, grant the three read scopes and leave out `resources:write
 
 ### 1. Create a dedicated Home Assistant key
 
-Get a key privately from the API owner, or create one using a credential with `keys:manage`. The creating credential must also have every permission you want to give the new key.
+[Create a developer account](/v1/developer-accounts) and make a dedicated key in the [developer console](https://api.alexxweb.com/developers), or create one through the API using a credential with `keys:manage`. The creating credential must also have every permission you want to give the new key.
 
 This example creates a key that can read resources and events and control switches and text:
 
@@ -101,7 +133,7 @@ curl https://api.alexxweb.com/api/v1/keys -H "Authorization: Bearer YOUR_MANAGEM
 
 For a read-only key, remove `"resources:write"` from `scopes`. The response's **key** is the secret value you will paste into Home Assistant. Save it privately when it is returned; the API shows it once. The response's **id** is an identifier for managing the key, not a value you can use to sign in.
 
-`expiresInDays` accepts 1–365. If you omit it, the default is 90 days. The new key cannot outlive the credential that creates it, so check the returned expiry date. When the key expires or is revoked, Home Assistant will ask you to reconnect with a replacement key for the same account.
+`expiresInDays` accepts 1–365. If you omit it, the default is 90 days. A key created by another API key cannot outlive the creating key, so check the returned expiry date. A key created from a developer account's browser session is not limited to that session's 12-hour lifetime. When the key expires or is revoked, Home Assistant will ask you to reconnect with a replacement key for the same account.
 
 See [API Keys](/v1/api-keys) for key creation, listing, and revocation.
 

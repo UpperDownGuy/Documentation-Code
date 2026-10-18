@@ -2,7 +2,20 @@
 title: "OAuth"
 sidebarTitle: "OAuth"
 description: "Let an app connect without giving it your API key."
+icon: "shield-check"
+openapi: "GET /.well-known/oauth-authorization-server"
+playground: "interactive"
 ---
+
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">App connections</span>
+  <p>Approve specific permissions and keep your private API key on AlexWeb.</p>
+</div>
+
+<div className="aw-doc-actions">
+  <a className="aw-doc-button aw-doc-button-primary" href="/v1/applications">Register an application</a>
+  <a className="aw-doc-button" href="#connect-an-app">Connection steps</a>
+</div>
 
 OAuth gives an app its own access token after you approve its permissions. Your private API key stays on the AlexWeb approval page.
 
