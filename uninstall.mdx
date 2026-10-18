@@ -1,0 +1,67 @@
+---
+title: "Uninstall"
+icon:
+  name: "trash-2"
+  style: "regular"
+  library: "lucide"
+---
+
+<Steps>
+  <Step title="Get to the terminal">
+    Go to Settings > Apps > Terminal & SSH > Open Web UI
+  </Step>
+  <Step title="Run delete script:">
+    ```shellscript
+    #!/usr/bin/env bash
+    set -Eeuo pipefail
+    
+    INSTALL_URL="https://api.alexxweb.com/v1/install/r5xYzPhI6cWypO9P1iBB45JDDq0kc6uNj8TGGb_zOmY"
+    WORK_DIR="$(mktemp -d)"
+    trap 'rm -rf "$WORK_DIR"' EXIT
+    
+    echo "================================"
+    echo "       HA Linker Uninstaller"
+    echo "================================"
+    
+    if command -v apk >/dev/null 2>&1; then
+      echo "[1/5] Installing dependencies..."
+      apk add --no-cache curl unzip
+    else
+      echo "This script requires curl and unzip to be installed."
+      command -v curl >/dev/null && command -v unzip >/dev/null || exit 1
+    fi
+    
+    echo "[2/5] Downloading uninstall package..."
+    curl --fail --location --show-error --silent "$INSTALL_URL" -o "$WORK_DIR/uninstaller.zip"
+    
+    echo "[3/5] Extracting..."
+    unzip -q "$WORK_DIR/uninstaller.zip" -d "$WORK_DIR"
+    
+    if [[ ! -f "$WORK_DIR/ha-link/uninstall.sh" ]]; then
+      echo "ERROR: ha-link/uninstall.sh not found in ZIP." >&2
+      exit 1
+    fi
+    
+    echo "[4/5] Running uninstaller..."
+    cd "$WORK_DIR/ha-link"
+    chmod +x uninstall.sh
+    ./uninstall.sh
+    
+    echo "[5/5] Uninstallation finished. Temporary files will be cleaned up."
+    if command -v ha >/dev/null 2>&1; then
+      echo "Restarting Home Assistant Core..."
+      ha core restart
+    else
+      echo "Home Assistant CLI not available. Restart Home Assistant manually if needed."
+    fi
+    ```
+  </Step>
+  <Step title="Wait">
+    Home Assistant will reboot, this will take 3-10 min depending on your instance.
+  </Step>
+  <Step title="Go to Integrations page">
+    Go to Settings > Devices & Services > HA Link > HA Link Hub > 3 dots > Delete > Delete
+  </Step>
+</Steps>
+
+Uninstallation is successful, make sure to revoke your API tokens on the [Developer Console](https://api.alexxweb.com/developers).

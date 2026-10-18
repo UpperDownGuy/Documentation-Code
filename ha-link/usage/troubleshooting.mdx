@@ -1,0 +1,31 @@
+---
+title: "Troubleshooting"
+description: "Find a missing connection or recover a page that will not load."
+icon:
+  name: "wrench"
+  library: "lucide"
+---
+
+Start here if HA Link is empty, a device is missing, or a connection shows an error.
+
+<Steps>
+  <Step title="Check the HA Link page">
+    Sign in as an administrator. If **Could not load HA Link** appears, check that HA Link is configured and Home Assistant has restarted after installation, then select **Retry**.
+  </Step>
+  <Step title="Clear your filters">
+    Under **Your entities**, clear the search and choose **All routes** and **All states**. Select the refresh icon at the top (**Refresh connections**).
+  </Step>
+  <Step title="Check the connection">
+    On the route's card, select **Set up** if it is not configured. Otherwise, select **Manage devices** and resolve any sign-in or connection message in the native integration.
+  </Step>
+  <Step title="Check the entity selection">
+    Select **Configure**, then open the HA Link entry's options to check **Connection routes** and **Other existing entities**. Hidden or disabled entities are not listed in HA Link.
+  </Step>
+  <Step title="Save diagnostic details">
+    If the problem continues, open **Settings → Devices & services → HA Link**. Open the integration entry's three-dot menu and select **Download diagnostics**.
+  </Step>
+</Steps>
+
+<Check>After fixing the connection, return to HA Link and refresh to check the result.</Check>
+
+For native integration errors, follow the [official troubleshooting guide](https://www.home-assistant.io/docs/configuration/troubleshooting/).

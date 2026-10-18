@@ -1,0 +1,31 @@
+---
+title: "HomeKit accessories"
+description: "Pair a compatible HomeKit accessory with Home Assistant."
+icon:
+  name: "house"
+  library: "lucide"
+---
+
+Use the accessory's HomeKit pairing code to connect it through **HomeKit Device**.
+
+<Steps>
+  <Step title="Open the HomeKit card">
+    Open **HA Link** in the Home Assistant sidebar and find **HomeKit accessories**. The card opens Home Assistant's native pairing and device pages.
+  </Step>
+  <Step title="Prepare the accessory">
+    Turn it on and find its HomeKit code. For a Wi-Fi accessory, connect it to your home network; if paired with Apple Home, remove it there to make it available for pairing.
+  </Step>
+  <Step title="Start pairing">
+    Select **Set up** on the card. You can also open **Settings → Devices & services** and select **Configure** on the discovered HomeKit Device entry.
+  </Step>
+  <Step title="Enter the code">
+    Select your accessory and enter its pairing code in Home Assistant. Choose a room and finish the setup.
+  </Step>
+  <Step title="Find the accessory">
+    Return to **HA Link** and select the refresh icon at the top (**Refresh connections**). Open an entity for its controls, or use **Manage devices** on the card to view paired accessories.
+  </Step>
+</Steps>
+
+<Check>Your accessory is paired with Home Assistant.</Check>
+
+For Bluetooth or Thread accessories, follow the matching section of the [official HomeKit Device guide](https://www.home-assistant.io/integrations/homekit_controller/).

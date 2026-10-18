@@ -1,0 +1,32 @@
+---
+title: "Configure HA Link"
+description: "Choose the connections and existing entities shown in your workspace."
+icon:
+  name: "settings"
+  library: "lucide"
+---
+
+Change HA Link's settings whenever you want to show different routes or include entities from another integration.
+
+<Steps>
+  <Step title="Open HA Link's integration page">
+    Select **Configure** at the top of the HA Link sidebar page. This opens the integration's page under **Settings → Devices & services**.
+  </Step>
+  <Step title="Open the options">
+    Open the HA Link entry's settings using its options or configure control. The form is titled **HA Link connections**.
+  </Step>
+  <Step title="Choose what to show">
+    Select the **Connection routes** you want in the workspace. Use **Other existing entities** to add entities already available in Home Assistant, such as ones from a manufacturer's integration.
+  </Step>
+  <Step title="Save your selection">
+    Keep at least one route or existing entity selected, then submit the form. Return to **HA Link** and refresh to check your workspace.
+  </Step>
+</Steps>
+
+<Check>
+HA Link shows your selected connections and entities. Removing a route here leaves its native integration and devices connected.
+</Check>
+
+<Note>
+Route selection changes the workspace. Pairing and account sign-in happen through the native integration's setup.
+</Note>

@@ -1,0 +1,33 @@
+---
+title: "Google Home speakers"
+description: "Find speakers, displays, and Chromecast devices with Google Cast."
+icon:
+  name: "speaker"
+  library: "lucide"
+---
+
+Use Google Cast to connect compatible Google Home and Nest speakers, displays, and Chromecast devices.
+
+<Steps>
+  <Step title="Open the speaker card">
+    Open **HA Link** in the Home Assistant sidebar and find **Google Home speakers**. Select **Set up**, or **Manage devices** if Google Cast is already connected.
+  </Step>
+  <Step title="Check your network">
+    Turn on your speakers and displays. Keep them on a network that Home Assistant can reach; an isolated guest network can prevent discovery.
+  </Step>
+  <Step title="Finish Google Cast setup">
+    Follow the native **Google Cast** setup prompts. Home Assistant can discover compatible devices on your local network.
+  </Step>
+  <Step title="Find your speakers">
+    Return to **HA Link** and select the refresh icon at the top (**Refresh connections**). Choose **Google Home speakers** in the route filter.
+  </Step>
+  <Step title="Open a speaker">
+    Select its media-player entity. Use the available Home Assistant playback and volume controls.
+  </Step>
+</Steps>
+
+<Check>Your compatible media devices are available from HA Link.</Check>
+
+<Note>For Nest cameras, doorbells, and thermostats, use the Google Nest devices card.</Note>
+
+If a speaker is missing, see the [official Google Cast guide](https://www.home-assistant.io/integrations/cast/).

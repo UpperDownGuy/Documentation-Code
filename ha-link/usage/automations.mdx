@@ -1,0 +1,33 @@
+---
+title: "Automations"
+description: "Use connected entities in a simple Home Assistant automation."
+icon:
+  name: "zap"
+  library: "lucide"
+---
+
+An automation runs an action when something happens. You can use the same entities you see in HA Link.
+
+<Steps>
+  <Step title="Open Automations">
+    Go to **Settings → Automations & scenes**. Select **Create automation → Create new automation**.
+  </Step>
+  <Step title="Choose when it runs">
+    Add a trigger under **When**, such as a time or a supported entity changing state. Start with one simple trigger.
+  </Step>
+  <Step title="Choose what happens">
+    Under **Then do**, add an action supported by your entity. For example, choose a light's turn-on action and select that light as the target.
+  </Step>
+  <Step title="Save the automation">
+    Select **Save** and give it a clear name. Leave it enabled so Home Assistant can respond to its trigger.
+  </Step>
+  <Step title="Check it works">
+    Cause the trigger to happen and check the device's response. Open the automation's trace if you need to see which steps ran.
+  </Step>
+</Steps>
+
+<Check>Your connected entity can now take part in Home Assistant automations.</Check>
+
+<Note>Some entities only report a reading. Use those as triggers or conditions, and choose a controllable entity for an action.</Note>
+
+For more options, see the [official automation editor guide](https://www.home-assistant.io/docs/automation/editor/).

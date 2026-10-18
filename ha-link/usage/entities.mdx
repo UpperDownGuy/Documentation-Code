@@ -1,0 +1,28 @@
+---
+title: "Your entities"
+description: "Find linked entities by name, connection, and availability."
+icon:
+  name: "list"
+  library: "lucide"
+---
+
+**Your entities** lists the controls and readings provided by your connected integrations. One physical device can have several entities.
+
+<Steps>
+  <Step title="Find an entity">
+    Open **HA Link** and scroll to **Your entities**. Type a name or entity ID, such as `light.kitchen`, into **Search by name or entity ID**.
+  </Step>
+  <Step title="Narrow the list">
+    Use **All routes** to choose a connection, or **Additional entities** when that option appears. Use **All states**, **Available**, or **Unavailable / unknown** to filter by status.
+  </Step>
+  <Step title="Read the result">
+    Each row shows the entity's name, ID, connection, and current state. Select a row to open its Home Assistant details and any supported controls.
+  </Step>
+  <Step title="Clear filters if something is missing">
+    Clear the search and return to **All routes** and **All states**. After setting up a connection, select the refresh icon.
+  </Step>
+</Steps>
+
+<Check>
+The result count shows how many entities match your filters. Hidden and disabled entities are excluded from HA Link.
+</Check>

@@ -1,0 +1,29 @@
+---
+title: "Connection routes"
+description: "Connect supported devices and understand each route's status."
+icon:
+  name: "network"
+  library: "lucide"
+---
+
+Use **Connection routes** on the HA Link page to open the right Home Assistant integration for your devices.
+
+<Steps>
+  <Step title="Choose your connection">
+    Find **HomeKit accessories**, **Matter devices**, **Alexa devices**, **Google Home speakers**, or **Google Nest devices**. Read the short description to check that it matches your device.
+  </Step>
+  <Step title="Open setup or management">
+    Select **Set up** to begin the native integration's setup, or **Manage devices** to open an existing integration. Use **Setup guide** if you need help with pairing or account sign-in.
+  </Step>
+  <Step title="Return and refresh">
+    Return to **HA Link** and select the refresh icon. **Ready to set up** means no integration entry exists, **Configured · not loaded** means none is loaded, and **Connected** means at least one is loaded.
+  </Step>
+</Steps>
+
+<Check>
+Each route shows its entity count and how many are available. A Connected label confirms the integration loaded; individual devices can still be unavailable.
+</Check>
+
+<Note>
+Selecting a route in HA Link's settings does not pair devices or sign in to an account.
+</Note>

@@ -1,0 +1,29 @@
+---
+title: "Entity controls"
+description: "Open and use the Home Assistant controls for a linked entity."
+icon:
+  name: "sliders-horizontal"
+  library: "lucide"
+---
+
+HA Link opens Home Assistant's existing entity details. The available controls depend on the entity and the integration that provides it.
+
+<Steps>
+  <Step title="Open an entity">
+    On the **HA Link** page, find an entity under **Your entities**. Select its row to open the Home Assistant details dialog.
+  </Step>
+  <Step title="Use the available controls">
+    Use the controls shown, such as a light switch, brightness slider, or media control, when supported. A sensor may show only a reading and history.
+  </Step>
+  <Step title="Check the result">
+    Check the entity's state after using a control. Close the dialog to return to HA Link and see its latest reported state in the list.
+  </Step>
+</Steps>
+
+<Check>
+You can use a linked entity without leaving the HA Link workspace. The same entity is available elsewhere in Home Assistant.
+</Check>
+
+<Note>
+If an entity is unavailable or a control is missing, check its native integration and device connection. HA Link cannot add actions that the source integration does not support.
+</Note>

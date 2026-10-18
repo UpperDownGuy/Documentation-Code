@@ -1,0 +1,33 @@
+---
+title: "Alexa devices"
+description: "Connect supported Alexa devices and open their controls."
+icon:
+  name: "mic"
+  library: "lucide"
+---
+
+Use this page for supported Echo, Fire, and other devices with Alexa built in.
+
+<Steps>
+  <Step title="Open the Alexa card">
+    Open **HA Link** in the Home Assistant sidebar and find **Alexa devices**. Select **Set up**, or **Manage devices** if you already connected your account.
+  </Step>
+  <Step title="Prepare your Amazon account">
+    Enable two-step verification with an authenticator app and make it your preferred method. Have a fresh verification code ready.
+  </Step>
+  <Step title="Complete the Alexa Devices setup">
+    Follow Home Assistant's sign-in prompts. Enter your account details and verification code in that native setup window.
+  </Step>
+  <Step title="Refresh HA Link">
+    Return to **HA Link** and select the refresh icon at the top (**Refresh connections**). Choose **Alexa devices** in the route filter to find its entities.
+  </Step>
+  <Step title="Open a control">
+    Select an entity to open its Home Assistant details. The available controls depend on your device.
+  </Step>
+</Steps>
+
+<Check>Your supported Alexa devices are connected, with their available entities shown in HA Link.</Check>
+
+<Note>This connection does not import every third-party accessory listed in the Alexa app.</Note>
+
+For sign-in help, see the [official Alexa Devices guide](https://www.home-assistant.io/integrations/alexa_devices/).

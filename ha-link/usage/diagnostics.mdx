@@ -1,0 +1,32 @@
+---
+title: "Diagnostic sensors"
+description: "Check HA Link's entity counts and connection details."
+icon:
+  name: "activity"
+  library: "lucide"
+---
+
+HA Link adds diagnostic sensors for **Linked entities**, **Available entities**, and each selected connection route.
+
+<Steps>
+  <Step title="Find HA Link's sensors">
+    Open **Settings → Devices & services**, select **HA Link**, and open its device. Find the diagnostic entities and select one to see its details.
+  </Step>
+  <Step title="Read the counts">
+    **Linked entities** counts the distinct entities in your workspace. **Available entities** excludes entities with no state or an unknown or unavailable state.
+  </Step>
+  <Step title="Check a route">
+    Open a route's entity-count sensor to see its attributes. **configured** means an integration entry exists, **loaded** means at least one entry loaded, and **available_entities** shows the available count.
+  </Step>
+  <Step title="Allow time for an update">
+    The enabled diagnostic sensors refresh their local inventory about every 30 seconds. After a connection changes, allow the next update before comparing counts.
+  </Step>
+</Steps>
+
+<Check>
+These counts help you spot a missing or unavailable connection. They count entities, not physical devices, and exclude hidden or disabled entities.
+</Check>
+
+<Note>
+A loaded integration does not guarantee every device is reachable. Check individual entity states when investigating a problem.
+</Note>

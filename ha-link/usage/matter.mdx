@@ -1,0 +1,31 @@
+---
+title: "Matter devices"
+description: "Add a Matter accessory or share one from another home app."
+icon:
+  name: "radio"
+  library: "lucide"
+---
+
+Matter lets compatible devices connect to Home Assistant, including devices already used in another home app.
+
+<Steps>
+  <Step title="Open the Matter card">
+    In **HA Link**, find **Matter devices**. Select **Set up**; on Home Assistant OS, accept the default Matter Server setup. **Manage devices** opens an existing connection.
+  </Step>
+  <Step title="Prepare your phone">
+    Open the current Home Assistant Companion app and enable Bluetooth. Thread accessories also need a working Thread border router.
+  </Step>
+  <Step title="Add a device">
+    In the Companion app, open **Settings → Connectivity → Matter → Add device**. Choose whether the device is new or already in use.
+  </Step>
+  <Step title="Follow the pairing prompts">
+    For a new device, scan its setup code. For a shared device, follow the prompts to generate a fresh sharing code in its current home app.
+  </Step>
+  <Step title="Finish and refresh">
+    Complete pairing, name the device, and choose an area. Return to **HA Link**, select the refresh icon at the top (**Refresh connections**), and open the device's entities.
+  </Step>
+</Steps>
+
+<Check>Your Matter device is available in Home Assistant.</Check>
+
+For phone and network requirements, see the [official Matter guide](https://www.home-assistant.io/integrations/matter/).

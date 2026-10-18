@@ -1,0 +1,31 @@
+---
+title: "Dashboards"
+description: "Put an existing device control or reading on your own dashboard."
+icon:
+  name: "layout-dashboard"
+  library: "lucide"
+---
+
+Entities connected through HA Link's routes work in Home Assistant dashboard cards too.
+
+<Steps>
+  <Step title="Choose your dashboard">
+    Open an editable dashboard from **Settings → Dashboards**. To make one, select **Add dashboard → New dashboard from scratch**, give it a name, and select **Create**.
+  </Step>
+  <Step title="Edit the view">
+    Open the dashboard and select the view you want. Select the edit button at the top right.
+  </Step>
+  <Step title="Add a card">
+    In a Sections view, select the plus button inside a section. For other layouts, select **Add card** at the bottom right.
+  </Step>
+  <Step title="Select an existing entity">
+    Choose **By entity** and select your device's control or reading. Check **Unassigned** if the entity has no area.
+  </Step>
+  <Step title="Save and use the card">
+    Choose a card from the preview and finish adding it. Select **Done** to save the view, then open the card to see the entity or use its controls.
+  </Step>
+</Steps>
+
+<Check>Your dashboard now includes an existing Home Assistant entity.</Check>
+
+For more card choices, see the [official dashboard cards guide](https://www.home-assistant.io/dashboards/cards/).

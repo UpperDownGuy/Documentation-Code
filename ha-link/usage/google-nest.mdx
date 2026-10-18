@@ -1,0 +1,31 @@
+---
+title: "Google Nest devices"
+description: "Connect supported Nest cameras, doorbells, and thermostats."
+icon:
+  name: "camera"
+  library: "lucide"
+---
+
+Use this connection for Nest devices supported by Google's Smart Device Management service.
+
+<Steps>
+  <Step title="Open the Nest card">
+    Open **HA Link** in the Home Assistant sidebar and find **Google Nest devices**. Select **Set up**, or **Manage devices** if Nest is already connected.
+  </Step>
+  <Step title="Check support first">
+    Open the official Nest guide below and check your device model. Google currently charges a one-time US$5 Device Access registration fee.
+  </Step>
+  <Step title="Follow the guided setup">
+    Home Assistant walks you through a Google Cloud project and a Device Access project. Use the official guide for the account and project settings.
+  </Step>
+  <Step title="Choose your devices">
+    Complete Google's authorization screens and allow the devices and features you want Home Assistant to access.
+  </Step>
+  <Step title="Refresh and open a device">
+    Return to **HA Link** and select the refresh icon at the top (**Refresh connections**). Filter by **Google Nest devices**, then select an entity to view its available controls.
+  </Step>
+</Steps>
+
+<Check>Your authorized, supported Nest devices now have entities in Home Assistant.</Check>
+
+Follow the [official Google Nest setup guide](https://www.home-assistant.io/integrations/nest/) for the project steps and supported models.

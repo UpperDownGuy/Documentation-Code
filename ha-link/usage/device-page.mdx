@@ -1,0 +1,31 @@
+---
+title: "Device page"
+description: "View a device's controls and readings, then organize it by room."
+icon:
+  name: "cpu"
+  library: "lucide"
+---
+
+A device page brings together the entities Home Assistant knows about for one device.
+
+<Steps>
+  <Step title="Open your device">
+    Go to **Settings → Devices & services → Devices**. Search for the device and select its name.
+  </Step>
+  <Step title="Check its controls and readings">
+    Look through the available controls and sensors. Select an entity to open its details; the contents depend on the device and integration.
+  </Step>
+  <Step title="Choose a room">
+    Return to the **Devices** list and select the device in selection mode. Select **Move to area** and choose its room.
+  </Step>
+  <Step title="Create an area if needed">
+    If the room is missing, open **Settings → Areas, labels & zones → Create area**. Give it a name, select **Create**, then assign your device to it.
+  </Step>
+  <Step title="Find it in HA Link">
+    Return to **HA Link**, select the refresh icon at the top (**Refresh connections**), and search for the device's entities. They appear when selected for HA Link and are not hidden or disabled.
+  </Step>
+</Steps>
+
+<Check>You know where to find your device's entities and which room it belongs to.</Check>
+
+For room organization, see the [official areas guide](https://www.home-assistant.io/docs/organizing/areas/).
