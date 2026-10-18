@@ -70,8 +70,8 @@
                     "group": "Setup",
                     "pages": [
                       "download",
-                      "uninstall",
-                      "integration-onboarding"
+                      "integration-onboarding",
+                      "uninstall"
                     ]
                   },
                   {
