@@ -1,0 +1,228 @@
+---
+title: "Installations"
+sidebarTitle: "Installations"
+description: "Upload installation files and copy download URLs and curl commands."
+icon: "download"
+---
+
+<div className="aw-doc-hero">
+  <span className="aw-doc-eyebrow">Share your installation files</span>
+  <p className="aw-doc-hero-title">Upload once. Copy a curl command.</p>
+  <p className="aw-doc-hero-copy">Give your Home Assistant plugin, package, or setup file a stable download link. Manage the file in the developer console and let users download it without an API key.</p>
+  <div className="aw-doc-actions">
+    <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/developers">Open developer console</a>
+    <a className="aw-doc-button" href="#download-with-curl">See the curl command</a>
+  </div>
+</div>
+
+An **installation** is a file you upload to AlexWeb. The API keeps its original bytes and gives it a URL in this format:
+
+```text
+https://api.alexxweb.com/v1/install/YOUR_INSTALLATION_TOKEN
+```
+
+`YOUR_INSTALLATION_TOKEN` is an example placeholder. Replace the entire example URL with the URL returned by your upload. The real token is a randomly generated, 256-bit value; you do not choose it or put your API key in its place.
+
+You can upload a ZIP archive, a shell script, a text file, or another package. AlexWeb stores and serves the file. It does not execute it or decide how your plugin should be installed. Your Home Assistant plugin still needs its own installation instructions for the system it supports.
+
+<Note>
+  Anyone with the download URL can download the file while the link is active. Upload files you intend to distribute. Keep passwords, API keys, personal configuration, and other private data out of installation packages.
+</Note>
+
+## Upload from the console
+
+<Steps>
+  <Step title="Open Installations">
+    Sign in to the [developer console](https://api.alexxweb.com/developers), or connect using an API key with `resources:write`. Open **Installations** in the sidebar.
+  </Step>
+  <Step title="Choose your file">
+    Select the file you want users to download and give it a recognizable display name. The file must be nonempty and no larger than **10 MiB**. For a plugin release, use a versioned filename such as `alexweb-ha-plugin-1.0.0.zip`.
+  </Step>
+  <Step title="Upload the file">
+    Wait for the upload to finish. AlexWeb returns the file's identifier, exact size, SHA-256 digest, and public download URL. Creating a link does not install the file on your computer or on Home Assistant.
+  </Step>
+  <Step title="Copy the command">
+    Copy the download link or curl command from the installation's controls. Run the command on the computer where you want to save the file, using the output filename you want. Follow the plugin's own setup instructions afterward.
+  </Step>
+</Steps>
+
+The display name helps you recognize the file in the console. The filename is the name supplied for a download. You cannot edit an uploaded file's contents in place: upload a new file for each release.
+
+## Download with curl
+
+This example saves a ZIP package in the current directory:
+
+<CodeGroup>
+
+```bash Linux or macOS
+curl --fail --show-error --location \
+  --output alexweb-ha-plugin.zip \
+  "https://api.alexxweb.com/v1/install/YOUR_INSTALLATION_TOKEN"
+```
+
+```powershell Windows PowerShell
+curl.exe --fail --show-error --location --output alexweb-ha-plugin.zip "https://api.alexxweb.com/v1/install/YOUR_INSTALLATION_TOKEN"
+```
+
+</CodeGroup>
+
+Replace the URL with your real download link. Change `alexweb-ha-plugin.zip` to the appropriate output filename for the file you uploaded. On Windows, `curl.exe` explicitly runs curl rather than a PowerShell alias.
+
+The options mean:
+
+| Option | What it does |
+| --- | --- |
+| `--fail` | Returns an error for an unsuccessful HTTP response instead of treating the error page as a successful download. |
+| `--show-error` | Shows curl's error message if a request fails. |
+| `--location` | Follows a redirect if the URL redirects. |
+| `--output` | Chooses where curl saves the downloaded bytes. |
+
+No authorization header is needed for this URL. Your account password and API key are used for managing uploads, and do not belong in the public download command.
+
+To check that a link is available without downloading its body:
+
+```bash
+curl --fail --head "https://api.alexxweb.com/v1/install/YOUR_INSTALLATION_TOKEN"
+```
+
+The download response uses `application/octet-stream` and an attachment filename. The `Content-Length` header gives its size in bytes. Partial downloads and download resume are not supported. Responses use `Cache-Control: no-store` so a deleted link is not intentionally retained as a cached download.
+
+## Check the file's SHA-256
+
+Every upload returns a `sha256` value calculated from the original bytes. After downloading the file, calculate its SHA-256 locally and compare it with the value from the console or authenticated metadata response.
+
+<CodeGroup>
+
+```bash Linux
+sha256sum alexweb-ha-plugin.zip
+```
+
+```bash macOS
+shasum -a 256 alexweb-ha-plugin.zip
+```
+
+```powershell Windows PowerShell
+Get-FileHash .\alexweb-ha-plugin.zip -Algorithm SHA256
+```
+
+</CodeGroup>
+
+The hexadecimal values should match, ignoring letter case. A matching digest confirms that the downloaded bytes match the uploaded file. It does not establish who wrote the file or whether the plugin is suitable for your Home Assistant installation.
+
+## Upload through the API
+
+Uploading requires `resources:write`. Send the file directly as the request body with `Content-Type: application/octet-stream`. Do not wrap it in JSON, base64, or a multipart form.
+
+```bash
+curl --fail --show-error \
+  "https://api.alexxweb.com/api/v1/installations" \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/octet-stream" \
+  --header "X-Install-Filename: alexweb-ha-plugin-1.0.0.zip" \
+  --header "X-Install-Name: Home%20Assistant%20plugin%201.0.0" \
+  --data-binary @alexweb-ha-plugin-1.0.0.zip
+```
+
+`--data-binary @filename` reads and sends the local file's original bytes. A successful upload returns HTTP **201** and one metadata object:
+
+```json
+{
+  "id": "inst_00000000-0000-4000-8000-000000000001",
+  "name": "Home Assistant plugin 1.0.0",
+  "filename": "alexweb-ha-plugin-1.0.0.zip",
+  "size": 2048,
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "createdAt": "2026-10-18T16:00:00.000Z",
+  "url": "https://api.alexxweb.com/v1/install/YOUR_INSTALLATION_TOKEN",
+  "status": "active"
+}
+```
+
+These are illustrative values. The example ID, token, digest, and size do not describe a real uploaded package.
+
+| Header | Required | Accepted value |
+| --- | --- | --- |
+| `Authorization` | Yes | `Bearer YOUR_API_KEY`, or an OAuth access token with the required scope. `X-API-Key` is also supported for API keys. |
+| `Content-Type` | Yes | `application/octet-stream`. |
+| `X-Install-Filename` | Yes | UTF-8 percent-encoded filename; 1–200 decoded Unicode characters. Use a basename with no directory separators or control characters. The names `.` and `..` are not accepted. |
+| `X-Install-Name` | No | UTF-8 percent-encoded display name; 1–120 decoded Unicode characters. If omitted, it defaults to the filename, shortened to 120 characters. |
+
+For spaces or non-ASCII characters, encode the header's value using JavaScript's `encodeURIComponent` behavior. For example, `Home Assistant plugin 1.0.0` becomes `Home%20Assistant%20plugin%201.0.0`. The developer console handles these headers for you.
+
+## Read metadata and list your files
+
+Reading metadata requires `resources:read`. It is separate from the public download: a person with a download link cannot list your account's other files.
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/installations` | Lists your account's stored installation files and storage usage. Accepts `limit` and `offset`. |
+| `POST /api/v1/installations` | Uploads bytes and creates a new file and link. |
+| `GET /api/v1/installations/{id}` | Reads one file's metadata, including its download URL and SHA-256. |
+| `DELETE /api/v1/installations/{id}` | Deletes a file and permanently revokes its download URL. |
+| `GET /v1/install/{token}` | Downloads the bytes publicly, without API authentication. |
+| `HEAD /v1/install/{token}` | Checks download headers publicly, without fetching a response body. |
+
+The list response contains `data` and `pagination`, using the same pagination format as other major API endpoints. It also contains:
+
+- **storage.usedBytes**: bytes used by the account's undeleted installation files.
+- **storage.activeCount**: number of stored files, including files whose creating credential is unavailable.
+- **storage.maxBytes**, **maxInstallations**, and **maxFileBytes**: the account and file limits.
+- **permissions**: the scopes used for reads and writes.
+
+The file's `id` is used for authenticated management requests. The random token in its `url` is used for public downloads. These are different values and cannot be substituted for each other.
+
+## Update or remove a release
+
+An upload is immutable. To publish a new version:
+
+1. Upload the new package, preferably with a version in its filename.
+2. Test its new download URL and compare the SHA-256.
+3. Update your plugin's instructions to use that new URL.
+4. Delete an older upload when you want to stop serving it.
+
+Old links continue to refer to their original bytes while they remain active. Uploading a newer file does not replace the content behind an earlier link.
+
+Deleting requires `resources:write`:
+
+```bash
+curl --fail --show-error --request DELETE \
+  "https://api.alexxweb.com/api/v1/installations/INSTALLATION_ID" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+A successful deletion returns `{ "id": "INSTALLATION_ID", "revoked": true }`. Deletion removes the stored bytes and permanently disables that URL. A later upload receives a new URL. Previously downloaded copies remain with their recipients.
+
+## How long a link works
+
+Links created while signed in to the console belong to the account and survive signing out of that browser session.
+
+Links created using an API key depend on that key remaining active. Expiring, revoking, or rotating the creating key makes those downloads unavailable.
+
+An OAuth-created upload also depends on the exact access token used to upload it. The download becomes unavailable when that token expires, normally after **15 minutes**, even if the app has a refresh token. Revoking the grant, disabling the application, or revoking its authorizing access can also stop the download. Use a signed-in account session in the console for a persistent plugin release URL.
+
+Metadata reports `status: "unavailable"` when its creating access is no longer active. The file still occupies storage until you delete it using another authorized credential. Public downloads return the same **404** for unknown, deleted, or unavailable links.
+
+## Limits and troubleshooting
+
+| Limit | Value |
+| --- | --- |
+| Maximum file size | 10 MiB: 10,485,760 bytes. |
+| Minimum file size | 1 byte. |
+| Stored files per account | 20 undeleted files. |
+| Stored file bytes per account | 100 MiB: 104,857,600 bytes. |
+
+The console's storage summary helps you check remaining space. An unavailable upload still counts toward the account's file and byte limits until deleted. Normal request allowances also apply; see [Usage & Limits](/v1/usage).
+
+| HTTP response | Meaning and next step |
+| --- | --- |
+| **400** | Check the filename, display name, percent encoding, and nonempty file body. |
+| **401** | Management credentials are missing, expired, or invalid. Sign in again or supply a valid key. |
+| **403** | Add `resources:read` for metadata, or `resources:write` for uploading and deletion. |
+| **404** | The ID is not in your account, or the public link is missing, deleted, or unavailable. Confirm that you copied the full URL. |
+| **409** | The account has reached its stored file count or byte allowance. Delete an unneeded upload before trying again. |
+| **413** | The uploaded file exceeds 10 MiB. Use a smaller package. |
+| **415** | Send the original bytes using `Content-Type: application/octet-stream`. |
+| **429** | A request allowance was reached. Wait for `Retry-After`. |
+| **503** | Upload capacity is temporarily unavailable or too many uploads are in progress. Honor `Retry-After` when present and try again later. |
+
+If curl reports a failure, inspect the HTTP response before following any plugin setup steps. The example URLs on this page intentionally contain placeholders and will not download a package until replaced with a real upload's URL.

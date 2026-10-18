@@ -24,32 +24,54 @@
     "languages": [
       {
         "language": "en",
-        "versions": [
+        "products": [
           {
-            "version": "V1",
-            "groups": [
+            "product": "AlexWeb API",
+            "versions": [
               {
-                "group": "Get Started",
-                "pages": [
-                  "v1/developer-accounts",
-                  "v1/release"
+                "version": "V1",
+                "groups": [
+                  {
+                    "group": "Get Started",
+                    "pages": [
+                      "v1/developer-accounts",
+                      "v1/release"
+                    ]
+                  },
+                  {
+                    "group": "API Usage",
+                    "pages": [
+                      "v1/base",
+                      "v1/status",
+                      "echo-endpoint",
+                      "v1/api-keys",
+                      "v1/oauth",
+                      "v1/applications",
+                      "v1/resources",
+                      "v1/installations",
+                      "v1/events",
+                      "v1/webhooks",
+                      "v1/schedules",
+                      "v1/usage",
+                      "v1/home-assistant"
+                    ]
+                  }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "product": "HA Link",
+            "versions": [
               {
-                "group": "API Usage",
-                "pages": [
-                  "v1/base",
-                  "v1/status",
-                  "echo-endpoint",
-                  "v1/api-keys",
-                  "v1/oauth",
-                  "v1/applications",
-                  "v1/resources",
-                  "v1/events",
-                  "v1/webhooks",
-                  "v1/schedules",
-                  "v1/usage",
-                  "v1/home-assistant"
+                "version": "V1",
+                "groups": [
+                  {
+                    "group": "Setup",
+                    "pages": [
+                      "download"
+                    ]
+                  }
                 ]
               }
             ]
