@@ -1,20 +1,498 @@
 ---
 title: "Home Assistant"
 sidebarTitle: "Home Assistant"
-description: "API support for a future Home Assistant integration."
+description: "Install AlexWeb API in Home Assistant, connect your account, and use resources and events in automations."
 ---
 
-The API is ready to share **AlexWeb resources and events** with Home Assistant.
+The **AlexWeb API** integration puts data from your AlexWeb account into Home Assistant. A resource becomes an entity you can display on a dashboard or use in an automation. API events also arrive on Home Assistant's event bus.
 
-<Info>
-  The Home Assistant integration itself will be built later. There is nothing to install in Home Assistant yet.
-</Info>
+For example, an app can save a temperature in AlexWeb and Home Assistant can display it as a sensor. A switch resource can store an on/off setting that Home Assistant and your app both read and change. An app can publish `custom.job_finished`, and a Home Assistant automation can react to it.
 
-This support exposes data stored in AlexWeb. It does not connect your existing Nest thermostats, Denon receiver or Homebridge devices.
+The integration connects to **AlexWeb resources and events**. It does not automatically import Nest thermostats, Denon receivers, Homebridge accessories, or other physical devices. Changing an AlexWeb switch changes the stored API value; a separate app or automation must act on that value if you want it to operate hardware.
 
-## Try it
+## Before you start
 
-A snapshot loads the current entities and an event cursor together. Your credential needs `resources:read`, `events:read` and `integrations:read`.
+You need:
+
+- **Home Assistant 2026.10.0 or newer.** This release targets the Home Assistant 2026.10 series.
+- The **AlexWeb API integration 1.0.0** package. Its file name is `alexweb-api-home-assistant-1.0.0.zip`. Obtain the package from the API owner or the integration package supplied with this release.
+- An AlexWeb account and either a dedicated API key or an OAuth application.
+- A connection from your Home Assistant server to `https://api.alexxweb.com`.
+- Access to Home Assistant's configuration folder so you can install a custom integration.
+
+You do not need to expose your Home Assistant server to the internet to use an API key. Home Assistant connects out to AlexWeb. This is a custom integration installed manually; these instructions do not require a HACS repository.
+
+The Home Assistant integration version, **1.0.0**, and the AlexWeb API version, **1.1.0**, are separate version numbers.
+
+## Install the integration
+
+1. Extract `alexweb-api-home-assistant-1.0.0.zip` on your computer. It contains a `custom_components` folder.
+2. Open your Home Assistant configuration folder. This is the folder containing `configuration.yaml`. On Home Assistant OS, file tools commonly show it as `/config` or `/homeassistant`.
+3. If `custom_components` does not exist inside that folder, create it.
+4. Copy the entire `alexweb_api` folder from the package into `custom_components`.
+5. Confirm that the files sit directly inside `custom_components/alexweb_api`. They must not be inside another nested `alexweb_api` or `custom_components` folder.
+6. Restart **Home Assistant Core** so it discovers the integration.
+7. Go to **Settings → Devices & services → Add integration** and search for **AlexWeb API**.
+
+The installed folder should look like this:
+
+```text
+configuration.yaml
+custom_components/
+  alexweb_api/
+    __init__.py
+    manifest.json
+    config_flow.py
+    application_credentials.py
+    client.py
+    coordinator.py
+    const.py
+    entity.py
+    sensor.py
+    binary_sensor.py
+    switch.py
+    text.py
+    strings.json
+    translations/
+      en.json
+```
+
+If you use File editor, create the folders first and upload the files into the matching folders. Keep `translations/en.json` inside `translations`. Uploading the ZIP itself into the configuration folder does not install it; its contents must be extracted and placed as shown above.
+
+You configure the connection in Home Assistant's interface. Do not add an `alexweb_api:` block to `configuration.yaml`.
+
+## Choose how to connect
+
+| Connection | What you provide | Best fit |
+| --- | --- | --- |
+| **API key** | API address and an AlexWeb key beginning with `aw_key_`. | The simplest setup for your own Home Assistant. Also supports another AlexWeb API server. |
+| **OAuth** | An AlexWeb confidential application's client ID and secret, followed by approval in your browser. | A connection with automatically refreshed access tokens and a separate application identity. Supports the hosted `api.alexxweb.com` service. |
+
+Both methods access the resources and events belonging to the account that approves the connection. Neither method gives Home Assistant permission to manage keys, applications, webhooks, or schedules unless you independently give it those scopes. This integration does not use those management permissions.
+
+### Permissions you need
+
+A **scope** is a permission attached to a key or OAuth token. All three read scopes below are required, even if you only want sensors.
+
+| Scope | Why Home Assistant needs it |
+| --- | --- |
+| `resources:read` | Loads the values, names, tags, and attributes of your resources. |
+| `events:read` | Receives resource changes and custom events. Resource-change events contain the full changed resource. |
+| `integrations:read` | Loads the Home Assistant entity mapping and initial snapshot. |
+| `resources:write` | Optional. Allows Home Assistant to turn AlexWeb switches on/off and change text resources. |
+
+For read-only access, grant the three read scopes and leave out `resources:write`. Sensors and binary sensors are always read-only in Home Assistant. Switch and text entities still appear on a read-only connection, but an attempt to change them returns a read-only error and does not change the API value.
+
+## Connect with an API key
+
+### 1. Create a dedicated Home Assistant key
+
+Get a key privately from the API owner, or create one using a credential with `keys:manage`. The creating credential must also have every permission you want to give the new key.
+
+This example creates a key that can read resources and events and control switches and text:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/keys -H "Authorization: Bearer YOUR_MANAGEMENT_KEY" -H "Content-Type: application/json" -d '{"name":"Home Assistant","scopes":["resources:read","events:read","integrations:read","resources:write"],"expiresInDays":365}'
+```
+
+</CodeGroup>
+
+For a read-only key, remove `"resources:write"` from `scopes`. The response's **key** is the secret value you will paste into Home Assistant. Save it privately when it is returned; the API shows it once. The response's **id** is an identifier for managing the key, not a value you can use to sign in.
+
+`expiresInDays` accepts 1–365. If you omit it, the default is 90 days. The new key cannot outlive the credential that creates it, so check the returned expiry date. When the key expires or is revoked, Home Assistant will ask you to reconnect with a replacement key for the same account.
+
+See [API Keys](/v1/api-keys) for key creation, listing, and revocation.
+
+### 2. Enter the connection in Home Assistant
+
+1. Add **AlexWeb API** under **Settings → Devices & services**.
+2. Choose **API key (simplest)**.
+3. Leave **API address** as `https://api.alexxweb.com`.
+4. Paste the complete `aw_key_...` value into **API key**. Do not add `Bearer` before it.
+5. Submit the form.
+
+Home Assistant checks the credential's account and permissions, then loads the resource snapshot. If the account has no resources yet, setup can succeed with no entities. Create a resource using the API and the integration will discover it.
+
+The address must be the API's base address, without `/api/v1`, a username, a password, a query string, or a fragment. A trailing `/` is accepted and removed. HTTPS is required for a public server. The API-key option also allows HTTP for a private IP address or localhost when connecting to your own local AlexWeb API.
+
+Remember that `localhost` in this form means the **Home Assistant server**, not the computer where your browser is running.
+
+## Connect with OAuth
+
+OAuth setup takes a few more steps. Home Assistant receives an access token after you approve its requested permissions. The integration uses the authorization-code flow with **S256 PKCE** and Home Assistant's token refresh support.
+
+This OAuth option connects to `https://api.alexxweb.com`. Use the API-key option for a different API server.
+
+### 1. Register a confidential application
+
+Use an AlexWeb credential with `apps:manage` and the scopes you want to register. Home Assistant needs a **confidential** application because it stores and uses a client secret.
+
+With the usual [My Home Assistant](https://www.home-assistant.io/integrations/my/) setup, register this exact redirect URL:
+
+```text
+https://my.home-assistant.io/redirect/oauth
+```
+
+This example registers an application with switch and text controls:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/apps -H "Authorization: Bearer YOUR_MANAGEMENT_KEY" -H "Content-Type: application/json" -d '{"name":"Home Assistant","type":"confidential","redirectUris":["https://my.home-assistant.io/redirect/oauth"],"scopes":["resources:read","events:read","integrations:read","resources:write"]}'
+```
+
+</CodeGroup>
+
+Save the returned **clientId** and **clientSecret** privately. The client secret is shown once. For a read-only application, remove `"resources:write"` from `scopes` and turn off controls when you connect in Home Assistant.
+
+The redirect URL must match exactly. Do not substitute the Home Assistant dashboard URL or add a trailing slash. If you have intentionally configured a different OAuth redirect, register the exact callback Home Assistant uses. AlexWeb accepts HTTPS callbacks and HTTP loopback callbacks; an ordinary `http://192.168.x.x` callback is not supported. The My Home Assistant HTTPS redirect is the recommended choice for a Home Assistant server accessed over local HTTP.
+
+My Home Assistant needs to be enabled for that redirect. It is included in a normal `default_config:` setup. The redirect page may ask you for your Home Assistant address so it can send the browser back to your installation.
+
+See [Applications](/v1/applications) for registration and [OAuth](/v1/oauth) for the authorization flow.
+
+### 2. Add application credentials in Home Assistant
+
+1. Go to **Settings → Devices & services**.
+2. Open the menu in the top-right corner and choose **Application credentials**.
+3. Select **Add application credentials** and choose **AlexWeb API**.
+4. Enter a recognizable name, the returned client ID, and the returned client secret.
+5. Save the application credentials.
+
+These are **AlexWeb** application credentials. You do not use a Google client ID, a Google password, or a Home Assistant login password here. Home Assistant manages them through its [Application credentials](https://www.home-assistant.io/integrations/application_credentials/) feature.
+
+### 3. Approve the connection
+
+1. Add **AlexWeb API** and choose **OAuth connection**.
+2. Leave **Allow switch and text controls** on if you registered `resources:write`. Turn it off for read-only access.
+3. Choose your registered application if Home Assistant shows an application picker.
+4. On the AlexWeb consent page, check the application name and requested permissions.
+5. Enter an AlexWeb API key for the account you want to connect. That key must have all the requested scopes. Enter it only on the AlexWeb consent page at `api.alexxweb.com`.
+6. Approve the connection and follow the redirect back to Home Assistant.
+
+The consent key identifies your AlexWeb account. It is not your Home Assistant password. The application's client ID and secret identify Home Assistant as an application; they do not by themselves select the account whose resources you will see.
+
+Access tokens last up to **15 minutes**. Home Assistant refreshes them automatically. The OAuth grant has a maximum lifetime of **30 days from approval**, and it can end sooner if its approving key or the app's registration key expires or is revoked. Refreshing a token does not extend that original deadline. Home Assistant asks you to approve the connection again when a new approval is required.
+
+Changing an application's callbacks or scopes, rotating its secret, or deleting it invalidates existing OAuth access. Update the application credentials if the secret changed, then reconnect in Home Assistant.
+
+## What you'll see
+
+Your resources appear under the **AlexWeb API** integration. They are grouped under one service device for the connected account. Each resource has its own entity, and you can add those entities to dashboards or use them in automations.
+
+| AlexWeb resource type | Home Assistant entity | Accepted API state | What you can do in Home Assistant |
+| --- | --- | --- | --- |
+| `sensor` | Sensor | A finite number or a string of up to 2,000 characters. | Read the value. Numeric metadata can supply a unit, device class, or statistics class. |
+| `binary_sensor` | Binary sensor | JSON `true` or `false`. | Read the on/off state, optionally with a valid binary-sensor device class. |
+| `switch` | Switch | JSON `true` or `false`. | Read the state; turn on/off when the connection has `resources:write`. |
+| `text` | Text | A string of up to 2,000 characters in the API. | Read short text; edit values of up to 255 characters from Home Assistant with `resources:write`. |
+
+For a switch, `true` means **on** and `false` means **off**. For a binary sensor, Home Assistant may display a device-specific label such as open/closed if you set a supported `device_class`.
+
+The API's resource ID is the permanent identity. Home Assistant also scopes it to the API server and account, so unrelated accounts cannot share entity identities. Replacing a key for the same account keeps those identities. Home Assistant chooses the visible `entity_id`; copy the actual one from the entity's settings when writing an automation.
+
+### Names, attributes, and tags
+
+The resource's `name` supplies its entity name. Rename a resource in the API to update the integration's name; a name you explicitly customize in Home Assistant can take precedence.
+
+Each entity exposes these attributes:
+
+| Attribute | Meaning |
+| --- | --- |
+| `resource_id` | The AlexWeb resource's ID. Use it for API requests. |
+| `resource_version` | The last confirmed resource version. It increases when the API updates the resource. |
+| `resource_tags` | The tags stored on the resource. |
+| `resource_attributes` | The complete metadata object supplied by your app. It is kept inside this object instead of overwriting Home Assistant's reserved attributes. |
+| `writable` | Whether this entity type supports a command and the current connection has permission to send it. |
+
+For numeric sensors, metadata such as `"device_class":"temperature"`, `"unit_of_measurement":"°C"`, and `"state_class":"measurement"` can give Home Assistant the correct display and statistics behavior. The integration validates these values against Home Assistant's supported classes and units. Invalid or incompatible metadata is ignored. String sensors do not receive numeric units or statistics classes.
+
+### Values longer than 255 characters
+
+AlexWeb accepts text and string-sensor values up to **2,000 characters**, but Home Assistant's normal entity state has a **255-character** limit.
+
+The integration does not truncate a longer value. Instead, its normal state is unknown and the full value is available in the **`resource_state`** attribute. It also adds **`state_exceeds_home_assistant_limit: true`**. This is a length limitation, not proof that the API is offline.
+
+To read the full value in a template, use your actual entity ID:
+
+```jinja2
+{{ state_attr('text.alexweb_api_status_message', 'resource_state') }}
+```
+
+The example entity ID is illustrative. Replace it with the one Home Assistant created. If you shorten the stored value to 255 characters or fewer, it appears as the normal state again. Home Assistant's text control accepts a maximum of 255 characters; use the [Resources API](/v1/resources) to store a longer string.
+
+## Create your first resources
+
+Resources are created in AlexWeb, then discovered by Home Assistant. The integration does not automatically create demo resources or offer a resource-creation form.
+
+The following requests need a credential with `resources:write`. A read-only Home Assistant key cannot run them; use a separate credential that has permission.
+
+### A temperature sensor
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/resources -H "Authorization: Bearer YOUR_WRITE_KEY" -H "Content-Type: application/json" -d '{"name":"Example temperature","type":"sensor","state":21.5,"attributes":{"device_class":"temperature","unit_of_measurement":"°C","state_class":"measurement"},"tags":["home-assistant"]}'
+```
+
+</CodeGroup>
+
+Home Assistant displays a numeric sensor. The integration reports the value saved in AlexWeb; it does not measure the room temperature itself. Your app can update it when a real measurement changes.
+
+### An on/off setting
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/resources -H "Authorization: Bearer YOUR_WRITE_KEY" -H "Content-Type: application/json" -d '{"name":"Example automation enabled","type":"switch","state":false,"attributes":{},"tags":["home-assistant"]}'
+```
+
+</CodeGroup>
+
+Home Assistant displays a switch. Turning it on saves `true` in AlexWeb, and turning it off saves `false`. This example is an application setting; it operates a physical device only if another app or automation uses the setting to do so.
+
+### A status message
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/resources -H "Authorization: Bearer YOUR_WRITE_KEY" -H "Content-Type: application/json" -d '{"name":"Example status message","type":"text","state":"Ready","attributes":{},"tags":["home-assistant"]}'
+```
+
+</CodeGroup>
+
+Save the **id** returned by each request. New resources are added automatically while the integration is running. Renaming or editing a resource updates its existing entity. Resource types are fixed when created; to use another type, create a new resource.
+
+Deleting a resource in AlexWeb makes its old Home Assistant entity **unavailable**. The integration preserves the registered entity so a deletion does not silently break your dashboards or automations. Remove the unused entity from Home Assistant yourself if you no longer need it. Creating another resource with the same name creates a different resource ID and entity identity.
+
+## How updates work
+
+The integration first loads a **snapshot** containing the current resource states and an **event cursor**. The cursor is a number identifying the last API event included in that snapshot. It then asks for events after that number.
+
+By default, it uses two update paths:
+
+- **Live updates:** a Server-Sent Events connection, often called **SSE**, receives changes as the API sends them. One connection serves all entities in an integration entry.
+- **Periodic checks:** Home Assistant uses a **30-second** check interval to read event pages after its current cursor. These checks recover changes if the live connection was interrupted. Successful live updates can reset the next scheduled check.
+
+The integration uses the cursor to ignore events already received through the other path. It reconnects after a dropped stream, with a delay that increases up to 60 seconds when failures continue. A working polling connection can keep the entities current while live updates are reconnecting.
+
+If Home Assistant cannot successfully update the account, its entities become unavailable until updates recover. A connected API resource with a value too long for the normal state instead remains available with an unknown state and the full value in its attributes.
+
+### Change the update settings
+
+Open **Settings → Devices & services → AlexWeb API** and use the entry's **Configure** or **Options** control.
+
+| Setting | Default | What it changes |
+| --- | --- | --- |
+| **Check interval** | 30 seconds | The time between periodic event checks. Accepts whole seconds from 15 to 300. |
+| **Use live updates** | On | Enables the SSE connection. Turn it off to rely on periodic checks only. |
+
+Saving options reloads the connection. An interval of 30 seconds is a practical default. A shorter interval creates more API requests; a longer one delays recovery or updates when SSE is off.
+
+### Recovery after missing history
+
+AlexWeb keeps the latest **10,000 events per account**. If the integration's cursor is older than the retained history, the API returns **410**. The integration automatically loads a fresh snapshot and resumes from its new cursor.
+
+That recovers current resource states. It cannot recreate custom events that have already left the API's retained history. The initial snapshot and a new snapshot after reload also start at the current cursor; events that happened before those snapshots are not replayed into Home Assistant automations. Treat event automations as reactions to events received while the connection is running, rather than as a durable job queue.
+
+## Use API events in an automation
+
+Every new API event received by the integration is fired on Home Assistant's event bus as **`alexweb_api_event`**. This includes resource changes, schedule execution events, and your app's `custom.*` events.
+
+### Event data
+
+For a `custom.job_finished` API event with `{"message":"Backup completed"}`, the Home Assistant event data looks like this:
+
+```json
+{
+  "entry_id": "HOME_ASSISTANT_ENTRY_ID",
+  "account_id": "ALEXWEB_ACCOUNT_ID",
+  "event_id": 123,
+  "type": "custom.job_finished",
+  "data": {
+    "message": "Backup completed"
+  },
+  "created_at": "2026-10-17T12:00:00.000Z"
+}
+```
+
+The IDs and timestamp above are examples. `type` is the AlexWeb event type, while `data` is the original event's payload. `entry_id` identifies this Home Assistant connection and `account_id` identifies its AlexWeb account. Neither field is an API key.
+
+For `resource.created` and `resource.updated`, `data` includes `resourceId` and the complete changed `resource`. For `resource.deleted`, it identifies the removed resource. Inspect the actual event for the exact fields needed by your automation.
+
+To inspect events, open **Developer tools → Events**, enter `alexweb_api_event` under **Listen to events**, and start listening. Publish a test event from your app. The event should appear immediately with SSE or on the next periodic check.
+
+### Publish a test event
+
+This request needs `events:write`. That permission is not required by the integration itself; use a key belonging to the app that publishes the event.
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/events -H "Authorization: Bearer YOUR_EVENT_KEY" -H "Content-Type: application/json" -d '{"type":"custom.job_finished","data":{"message":"Backup completed"}}'
+```
+
+</CodeGroup>
+
+Publishing that event in AlexWeb is different from manually firing `alexweb_api_event` in Home Assistant. Manually firing the Home Assistant event can test an automation, but it does not create an API event or change an AlexWeb resource.
+
+### Example automation
+
+Create an empty automation under **Settings → Automations & scenes**, open its YAML editor, and use this example. It listens for `custom.job_finished` and creates a Home Assistant notification.
+
+```yaml
+alias: AlexWeb job finished
+description: Show a notification when an AlexWeb app reports a completed job.
+triggers:
+  - trigger: event
+    event_type: alexweb_api_event
+    event_data:
+      type: custom.job_finished
+conditions: []
+actions:
+  - action: persistent_notification.create
+    data:
+      title: AlexWeb job finished
+      message: >-
+        {{ trigger.event.data.data.get('message', 'An AlexWeb job finished.') }}
+mode: queued
+max: 10
+```
+
+`trigger.event.data` is the integration's event envelope. The second `.data` accesses your app's original payload. The `.get()` supplies a fallback message if your payload does not include `message`.
+
+If several AlexWeb accounts are connected to the same Home Assistant, add `account_id: YOUR_ACCOUNT_ID` or `entry_id: YOUR_ENTRY_ID` under `event_data` to restrict the trigger to one connection. You can copy those IDs from the event listener.
+
+You can also use ordinary Home Assistant state triggers with a resource entity, such as a switch becoming `on`. See Home Assistant's [event trigger documentation](https://www.home-assistant.io/docs/automation/trigger/#event-trigger) for additional trigger options.
+
+## Control a switch or text resource
+
+Use the standard Home Assistant actions **`switch.turn_on`**, **`switch.turn_off`**, and **`text.set_value`**, or use the entity's dashboard control. Choose your actual AlexWeb entity as the target. The connection must have `resources:write` as well as the three read scopes.
+
+The integration sends the resource's last confirmed **version** with each command. A version is the resource's change number. If an app changes a resource before Home Assistant submits its command, the old version prevents Home Assistant from overwriting that newer change.
+
+The entity only changes after the API confirms the command. It does not show a successful change in advance of a server response. If the API returns **412**, the integration refreshes the resource and tells you that it changed elsewhere. Review the refreshed state and try again; it does not automatically overwrite the other client's change.
+
+For example, when you call the API directly, this command needs the version you last read:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/integrations/home-assistant/commands -H "Authorization: Bearer YOUR_WRITE_KEY" -H "Content-Type: application/json" -d '{"resourceId":"RESOURCE_ID","command":"set_state","state":true,"version":1}'
+```
+
+</CodeGroup>
+
+Replace `RESOURCE_ID` and `1` with the real resource ID and current version. The API accepts this command for switch and text resources only. A successful response contains the updated entity and its new version.
+
+## Replace credentials or reconnect
+
+### API key replacement
+
+Create a new dedicated key for the **same AlexWeb account**, with the three read scopes and optional write scope. In the integration entry's menu, choose **Reconfigure** and paste the new key. Leave the API address unchanged. Leaving the optional key field empty keeps the existing key.
+
+If Home Assistant has already marked the credential invalid, use its reconnect or repair prompt instead. That flow asks for a new key and verifies that it belongs to the original account.
+
+After confirming that the replacement works, revoke the old key in AlexWeb. Reconfiguration does not revoke the previous key for you.
+
+### OAuth reapproval
+
+Follow the reconnect prompt when Home Assistant reports that approval is needed. Approve using the original AlexWeb account. Use **Reconfigure** if you need to request switch/text permissions again or change a read-only OAuth connection to one with controls. The application registration and the approving key must include the newly requested scopes.
+
+An account is uniquely identified by its API server and account ID. The integration does not allow you to replace an existing entry with credentials for another account or a different API server. Add a separate integration entry for a different server or account. Adding the same server and account twice reports that it is already configured.
+
+## Update or remove the integration
+
+To update the integration, obtain the new release package, back up your Home Assistant configuration, replace the files inside `custom_components/alexweb_api`, and restart Home Assistant Core. Keep the folder name `alexweb_api`. Use the release's compatibility requirements when upgrading.
+
+To disconnect an account, remove its entry under **Settings → Devices & services**. Reloading or removing an entry stops its live-event connection and unloads its entities. It does not delete the resources, events, API keys, or applications stored in AlexWeb.
+
+Revoke the dedicated API key in AlexWeb if it is no longer needed. For OAuth, remove or revoke the application's authorization in AlexWeb as appropriate; deleting a registered application revokes its OAuth access. Home Assistant's stored application credentials can be managed separately from the integration entry. See [Home Assistant's credential removal instructions](https://www.home-assistant.io/integrations/application_credentials/#deleting-application-credentials).
+
+To uninstall the custom integration completely, remove its Home Assistant entries first, remove only the `custom_components/alexweb_api` folder, and restart Home Assistant Core.
+
+## Limits to keep in mind
+
+| Limit | Effect |
+| --- | --- |
+| 500 resources per AlexWeb account | The integration can load the supported resources in that account. |
+| 120 requests per minute per credential | Other apps sharing a key also consume that key's request allowance. A dedicated key avoids that overlap. |
+| 5 simultaneous live event streams per account | Each live integration entry uses one stream. Other API clients count toward the same account limit. |
+| 10,000 retained API events per account | An older cursor requires a new snapshot. Expired custom-event history cannot be replayed. |
+| 100 events per API page | The integration catches up in pages, with up to 10 pages in one periodic check. A large burst can take additional checks. |
+| 15–300 seconds for periodic checks | The default is 30 seconds, including when live updates are enabled. |
+| 255 characters in a Home Assistant state | Longer API string values are kept in `resource_state`, rather than truncated. |
+| 2,000 characters in an API text/string-sensor state | Longer strings are rejected by the AlexWeb Resources API. |
+
+The API also limits JSON request bodies to 16 KiB. Resource attributes have their own size and structure limits; see [Resources](/v1/resources). Your app should keep payloads and metadata small enough for the API's documented limits.
+
+## Troubleshooting
+
+### AlexWeb API is missing from Add integration
+
+Check that `manifest.json` is directly inside the configuration folder's `custom_components/alexweb_api` directory. Make sure you uploaded all files, including `__init__.py` and `translations/en.json`. Restart Home Assistant Core after installing files, then refresh the browser and search again. Confirm that Home Assistant is 2026.10.0 or newer. Check **Settings → System → Logs** for an `alexweb_api` loading error if it still does not appear.
+
+### Setup succeeds, but there are no entities
+
+An account with no resources produces no entities. Create a sensor, binary sensor, switch, or text resource using the Resources API. Make sure the creating app and Home Assistant's key or OAuth approval use the same account. Wait for a live update or the next periodic check. Check the integration's entities list as well as your dashboard; new entities do not necessarily appear on a manually configured dashboard automatically.
+
+### The API address is rejected
+
+Use `https://api.alexxweb.com`, with no `/api/v1` suffix. Do not include spaces, login credentials, query parameters, or a fragment. For a local API-key connection, HTTP is permitted only for a private IP address or localhost. OAuth uses the hosted AlexWeb API address.
+
+### Invalid authentication or HTTP 401
+
+The key or token is invalid, expired, or revoked. For an API key, paste the complete `aw_key_...` value and omit the word `Bearer`. A key ID is not a key secret. Create a replacement for the same account and use the reconnect prompt or **Reconfigure**. For OAuth, approve again; if the application secret changed, update Home Assistant's application credentials first.
+
+### Missing permissions or HTTP 403
+
+The connection requires **all three** of `resources:read`, `events:read`, and `integrations:read`. Add `resources:write` if you want switch/text controls. A key's permissions are fixed when it is created, so create a replacement key with the needed scopes. For OAuth, register the needed scopes on the application and approve again. Changing the application's scopes invalidates older grants.
+
+### A switch or text control says the connection is read-only
+
+The entity is visible, but the connected credential has no `resources:write`. Replace the key with one that has write permission, or reconfigure OAuth with **Allow switch and text controls** on. The app's allowed scopes and the key used on the consent page must both permit writes. Sensors and binary sensors remain read-only by design.
+
+### OAuth reports a callback or redirect mismatch
+
+Register the exact redirect used by Home Assistant. With My Home Assistant, it is `https://my.home-assistant.io/redirect/oauth`. Check spelling, scheme, path, and trailing slash. Make sure My Home Assistant is enabled and its redirect page points at your Home Assistant installation. An HTTP LAN dashboard address is not a supported AlexWeb OAuth callback. Restart the authorization flow after correcting the application registration.
+
+### Cannot connect, or entities are unavailable
+
+Check that the API is reachable from the Home Assistant server, not just from your browser. Verify DNS, internet access, the API address, and TLS connectivity. The integration rejects API redirects, so use the actual server address instead of a redirecting URL. Temporary connection or server failures are retried; successful periodic updates restore availability. If authentication has failed, reconnect with working credentials.
+
+### Live updates stopped, but periodic updates work
+
+Leave **Use live updates** on and allow the stream to reconnect. A proxy or firewall may be interrupting the long-running connection. A 45-second stream read timeout detects a connection that stops sending data. If needed, turn live updates off and use periodic checks while you investigate. You do not need to open an inbound port to your Home Assistant server for this connection.
+
+### HTTP 429 or request limit reached
+
+The integration waits for the API's `Retry-After` period before making more API requests; its delay is bounded to 1–300 seconds. It also pauses stream reconnection when limited. Keep the default 30-second check interval, and use a dedicated key so unrelated apps do not share the same credential's request budget. Too many streams can also return 429; the account supports at most five at once. Avoid repeatedly reloading or submitting controls while the limit is active.
+
+### HTTP 410 or an event cursor expired
+
+The integration automatically replaces the expired cursor with a fresh snapshot. Current resource states recover. Events no longer present in the retained history are not replayed into automations. No manual cursor editing is required.
+
+### A command fails with HTTP 412
+
+Another client changed the resource before your command was saved. The integration refreshes the state and reports the conflict. Review the new value and try again. This prevents your older view from silently overwriting a newer edit.
+
+### Text or a string sensor shows unknown
+
+Check `state_exceeds_home_assistant_limit` and `resource_state` in the entity's attributes. A string longer than 255 characters is still stored in AlexWeb and is available in `resource_state`; shorten it to show it as the normal Home Assistant state. This differs from **unavailable**, which indicates a connection or resource-availability issue.
+
+### An old entity remains after deleting its resource
+
+The integration leaves the registered entity unavailable. Remove the unused entity in Home Assistant after updating any dashboards or automations that reference it. Recreating the same name in AlexWeb does not reuse the old resource ID.
+
+### Reconnecting says the account does not match
+
+Use a replacement credential for the original account and API address. If you intend to connect another account or another server, add a separate integration entry. This check prevents an existing entity set from being silently reassigned to another account.
+
+## Try the API directly
+
+This snapshot request is useful when checking your key independently of Home Assistant. It needs the three read scopes.
 
 <CodeGroup>
 
@@ -24,39 +502,50 @@ curl https://api.alexxweb.com/api/v1/integrations/home-assistant/snapshot -H "Au
 
 </CodeGroup>
 
-## What you'll see
+## What the snapshot contains
 
-The response contains **entities** and a **cursor**.
+The response has **entities**, **cursor**, and **createdAt**. Each entity includes its resource ID, stable unique ID, suggested API entity ID, domain, name, state, attributes, tags, version, availability, and whether its type supports commands. The integration additionally checks your credential's write scope before allowing a command.
 
-- **entities** represents your AlexWeb resources as sensors, binary sensors, switches or text values. Only switches and text values accept commands from this integration.
-- Each entity has a stable ID based on its resource ID.
-- **cursor** lets the integration read updates without missing changes during setup.
+The snapshot's suggested `entityId` is API metadata. Home Assistant's entity registry decides the actual entity ID you use in its dashboards and automations.
 
-The future integration will use the domain `alexweb_api`. It can authenticate with an API key or OAuth with S256 PKCE.
+Here is a shortened example with one switch resource:
 
-## Send a command
-
-This changes an AlexWeb switch resource. It needs all three read permissions above, plus `resources:write`.
-
-<CodeGroup>
-
-```powershell CURL
-curl https://api.alexxweb.com/api/v1/integrations/home-assistant/commands -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"resourceId":"RESOURCE_ID","command":"set_state","state":true,"version":1}'
+```json
+{
+  "entities": [
+    {
+      "resourceId": "8f4dc56d-174f-4874-900e-56a773e4bb20",
+      "uniqueId": "alexweb_api_8f4dc56d-174f-4874-900e-56a773e4bb20",
+      "entityId": "switch.alexweb_8f4dc56d174f4874900e56a773e4bb20",
+      "domain": "switch",
+      "name": "Example automation enabled",
+      "state": false,
+      "attributes": {},
+      "tags": ["home-assistant"],
+      "version": 1,
+      "available": true,
+      "writable": true
+    }
+  ],
+  "cursor": 123,
+  "createdAt": "2026-10-17T12:00:00.000Z"
+}
 ```
 
-</CodeGroup>
-
-The **version** field is required. Use the version you last read to protect against overwriting a newer state. An outdated version returns **412**.
+In this example, the switch currently stores `false` and its last saved version is `1`. `writable: true` means its resource type accepts a command; a read-only credential still cannot send one. The cursor `123` means the client should ask for events **after** event 123 rather than treating it as a resource version. The cursor and resource version serve different purposes.
 
 ## Other requests
 
+These requests support the same major Home Assistant feature; they do not require separate Home Assistant integrations or separate documentation pages.
+
 | Request | What it does | Required scopes |
 | --- | --- | --- |
-| `GET /api/v1/integrations/home-assistant/manifest` | Public integration discovery and readiness. | None |
+| `GET /api/v1/integrations/home-assistant/manifest` | Public integration discovery, API support, and compatibility information. | None |
 | `GET /api/v1/integrations/home-assistant` | Reads integration information. | `integrations:read`, `resources:read`, `events:read` |
-| `GET /api/v1/integrations/home-assistant/entities` | Lists compatible entities. | `integrations:read`, `resources:read`, `events:read` |
-| `GET /api/v1/integrations/home-assistant/snapshot` | Loads entities and an event cursor together. | `integrations:read`, `resources:read`, `events:read` |
-| `POST /api/v1/integrations/home-assistant/commands` | Sets a switch or text resource's state. | All three read scopes, plus `resources:write` |
+| `GET /api/v1/integrations/home-assistant/entities` | Lists the account's compatible entities. | `integrations:read`, `resources:read`, `events:read` |
+| `GET /api/v1/integrations/home-assistant/snapshot` | Loads entity states and the matching event cursor together. | `integrations:read`, `resources:read`, `events:read` |
+| `POST /api/v1/integrations/home-assistant/commands` | Sets a switch or text resource's state using its current version. | All three read scopes, plus `resources:write` |
+| `GET /api/v1/events` | Reads events after a cursor for periodic updates. | `events:read` |
+| `GET /api/v1/events/stream` | Receives live events through SSE. | `events:read` |
 
-After loading a snapshot, use [event polling or streaming](/v1/events) for updates. A 30-second poll interval is a useful starting point. If the API returns **410**, load a new snapshot and continue from its cursor.
-
+For app-side resource management, use [Resources](/v1/resources). For event payloads and polling, use [Events](/v1/events). For credential setup, use [API Keys](/v1/api-keys), [Applications](/v1/applications), and [OAuth](/v1/oauth).
