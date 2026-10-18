@@ -32,6 +32,16 @@
 
 /* AlexWeb documentation navbar logo */
 
+/* Let the search label shrink without pushing its shortcut out of the bar. */
+#sidebar #search-bar-entry > div {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+#sidebar #search-bar-entry > span {
+  flex-shrink: 0;
+}
+
 /* ===================================
    ALEXWEB DOCUMENTATION - NAVBAR
    =================================== */
