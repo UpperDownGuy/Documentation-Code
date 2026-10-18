@@ -46,22 +46,26 @@ img.nav-logo {
   object-fit: contain !important;
 }
 
-/* Desktop: move theme selector to
-   bottom-left of the sidebar */
-/* Theme switcher: directly above V1 */
-
-/* Full-width theme switcher above V1 */
-
-/* AlexWeb - Theme switcher above V1 */
+/* Keep the desktop theme control above the sidebar's natural footer.
+   Reserving space in the scroll area prevents links from passing behind it. */
 @media (min-width: 1024px) {
+  #sidebar-content {
+    position: relative;
+  }
+
+  #sidebar-content > [data-component-part="scroll-area-viewport"] {
+    height: calc(100% - 60px) !important;
+  }
+
   [data-theme-preference-switch="pill"] {
-    position: fixed !important;
+    position: absolute !important;
 
-    /* Center within 304px sidebar */
+    /* The containing block ends where the footer links begin. */
     left: 7px !important;
-    bottom: 84px !important;
+    bottom: 8px !important;
 
-    width: 290px !important;
+    width: calc(100% - 14px) !important;
+    box-sizing: border-box !important;
     height: 44px !important;
     max-width: none !important;
 
