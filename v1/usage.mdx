@@ -1,0 +1,76 @@
+---
+title: "Usage & Limits"
+sidebarTitle: "Usage & Limits"
+description: "Check requests, recent changes and API limits."
+---
+
+Usage shows how your account uses the API. Audit history shows which changes were made.
+
+Both requests need `usage:read`.
+
+## Try it
+
+<CodeGroup>
+
+```powershell CURL
+curl "https://api.alexxweb.com/api/v1/usage?days=7" -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## What you'll see
+
+Request counts are grouped by **day**, **route**, **status** and **credential ID**. Use `days` from 1 to 30; the default is 7.
+
+Audit records include the action, time, target and credential ID. Keys, tokens and signing secrets are not included.
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/usage` | Reads request counts for your account. |
+| `GET /api/v1/audit` | Lists recent account actions. |
+
+## API limits
+
+| Limit | Amount |
+| --- | --- |
+| Authenticated requests | 120 per minute, per credential. |
+| Public requests | 60 per minute, per IP address. |
+| JSON request body | 16 KiB. |
+| Default list size | 25 items; events default to 100. |
+| Maximum list size | 100 items. |
+| Stored resources / webhooks / schedules | 500 / 25 / 100 per account. |
+| Open event streams | 5 per account. |
+
+List requests accept `limit` and `offset`. Responses contain **data** and **pagination**, including **total** and **hasMore**. [Events](/v1/events) use a cursor instead.
+
+If you reach the request limit, the API returns **429**. Wait for the number of seconds in the `Retry-After` header before retrying. Rate limit headers show the current allowance.
+
+## If a request fails
+
+```json
+{
+  "error": {
+    "code": "invalid_input",
+    "message": "Check the request fields.",
+    "requestId": "REQUEST_ID"
+  }
+}
+```
+
+| Status | Meaning |
+| --- | --- |
+| **400** | Invalid request fields or JSON. |
+| **401** | Missing or invalid key or token. |
+| **403** | Your credential lacks a required permission. |
+| **404** | The requested item does not exist. |
+| **409** | The change conflicts with existing data. |
+| **410** | The event cursor is too old. |
+| **412** | The resource version has changed. |
+| **413** | The request body is too large. |
+| **415** | Use the expected content type. |
+| **429** | Too many requests; wait and retry. |
+
+Every response includes `X-Request-Id`. Keep it when asking for help. OAuth token requests use the [OAuth error format](/v1/oauth).
+

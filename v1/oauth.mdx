@@ -1,0 +1,99 @@
+---
+title: "OAuth"
+sidebarTitle: "OAuth"
+description: "Let an app connect without giving it your API key."
+---
+
+OAuth gives an app its own access token after you approve its permissions. Your private API key stays on the AlexWeb approval page.
+
+First [register an application](/v1/applications). OAuth here connects to **AlexWeb**, rather than signing in with Google.
+
+## Connect an app
+
+1. Your app generates a random **code verifier** and its SHA-256 **code challenge**. This is called PKCE.
+2. It opens `/oauth/authorize` in a browser with the parameters below.
+3. You review the permissions, enter your API key on that page and choose **Connect app**.
+4. The browser returns to the registered callback with a one-time **code**, your **state** value and **iss**. Your app checks that state matches and the issuer is `https://api.alexxweb.com`.
+5. Your app exchanges the code and original verifier for tokens.
+
+| Authorization parameter | Value |
+| --- | --- |
+| `response_type` | `code` |
+| `client_id` | The app's `clientId`. |
+| `redirect_uri` | Its exact registered callback URL. |
+| `scope` | Requested permissions, separated by spaces. |
+| `state` | A fresh random value of 8–500 characters, checked at the callback. |
+| `code_challenge` | Base64url SHA-256 hash of the verifier, without padding. |
+| `code_challenge_method` | `S256` |
+
+Use a verifier of 43–128 URL-safe characters. S256 PKCE is required for public and confidential apps.
+
+## Try it
+
+After approval, a public app exchanges its code like this. Replace every placeholder with the values from that same connection attempt.
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/oauth/token -d "grant_type=authorization_code" -d "client_id=CLIENT_ID" -d "code=AUTHORIZATION_CODE" --data-urlencode "redirect_uri=https://example.com/callback" -d "code_verifier=CODE_VERIFIER"
+```
+
+</CodeGroup>
+
+A confidential app also authenticates with `-u "CLIENT_ID:CLIENT_SECRET"`. Keep that secret on its server.
+
+## What you'll see
+
+```json
+{
+  "access_token": "ACCESS_TOKEN",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "scope": "resources:read events:read",
+  "refresh_token": "REFRESH_TOKEN"
+}
+```
+
+- **access_token** works in `Authorization: Bearer ACCESS_TOKEN`.
+- **expires_in** is its lifetime in seconds: up to 15 minutes.
+- **refresh_token** gets a replacement access token. Save it privately.
+
+## Refresh access
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/oauth/token -d "grant_type=refresh_token" -d "client_id=CLIENT_ID" -d "refresh_token=REFRESH_TOKEN"
+```
+
+</CodeGroup>
+
+Save the new refresh token each time; the previous one stops working. The connection lasts up to 30 days after its original approval, and ends sooner if the approving key expires or is revoked. The user must then approve again.
+
+## Server apps
+
+A confidential app can use `client_credentials` for its own approved permissions:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/oauth/token -u "CLIENT_ID:CLIENT_SECRET" -d "grant_type=client_credentials" --data-urlencode "scope=resources:read events:read"
+```
+
+</CodeGroup>
+
+This grant returns an access token without a refresh token.
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /.well-known/oauth-authorization-server` | Lists OAuth endpoints and supported options. |
+| `GET /oauth/authorize` | Opens the approval page. |
+| `POST /oauth/authorize` | Submits that page's Connect app or Cancel choice. |
+| `POST /oauth/token` | Exchanges a code, refreshes access or connects a server app. |
+| `POST /oauth/revoke` | Disconnects a token. |
+
+Revoke a public app's refresh token with form fields `token=REFRESH_TOKEN` and `client_id=CLIENT_ID`. A confidential app also uses HTTP Basic authentication. Revoking a refresh token removes the connection's access tokens too.
+
+Token requests use form data. OAuth failures use **error** and **error_description**, such as `invalid_grant` for an expired code.

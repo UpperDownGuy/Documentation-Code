@@ -34,7 +34,16 @@
             "group": "API Usage",
             "pages": [
               "v1/base",
-              "echo-endpoint"
+              "echo-endpoint",
+              "v1/api-keys",
+              "v1/oauth",
+              "v1/applications",
+              "v1/resources",
+              "v1/events",
+              "v1/webhooks",
+              "v1/schedules",
+              "v1/usage",
+              "v1/home-assistant"
             ]
           }
         ]

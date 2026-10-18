@@ -1,0 +1,81 @@
+---
+title: "Events"
+sidebarTitle: "Events"
+description: "Read changes and send your own events."
+---
+
+Events tell apps what changed. Resource updates create events automatically, and your app can send its own.
+
+Reading needs `events:read`. Resource change events include the resource's full state and attributes, so give this permission only to apps allowed to read that data. Publishing needs `events:write`.
+
+## Try it
+
+<CodeGroup>
+
+```powershell CURL
+curl "https://api.alexxweb.com/api/v1/events?after=0&limit=25" -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## What you'll see
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "type": "custom.example",
+      "data": { "message": "Hello" },
+      "createdAt": "2026-10-17T12:00:00.000Z"
+    }
+  ],
+  "cursor": 1,
+  "hasMore": false,
+  "oldestCursor": 1
+}
+```
+
+- **type** describes the change.
+- **data** contains its details.
+- **cursor** is your place in the event list. Use it as `after` in the next request.
+- **hasMore** means another page is available.
+
+## Send an event
+
+Your own event names must begin with `custom.`.
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/events -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"type":"custom.example","data":{"message":"Hello"}}'
+```
+
+</CodeGroup>
+
+## Listen live
+
+This connection stays open and sends new events as they happen:
+
+<CodeGroup>
+
+```powershell CURL
+curl -N https://api.alexxweb.com/api/v1/events/stream -H "Authorization: Bearer YOUR_API_KEY" -H "Last-Event-ID: 1"
+```
+
+</CodeGroup>
+
+Each message has an `id`, an `event` type and JSON `data`. Reconnect using the latest event ID. Keep credentials in headers; browser apps need a client that supports authenticated streams.
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/events` | Reads events after a cursor; accepts `limit` and `type`. |
+| `POST /api/v1/events` | Publishes a custom event. |
+| `GET /api/v1/events/stream` | Streams events, using `after` or `Last-Event-ID`. |
+
+Automatic types include `resource.created`, `resource.updated`, `resource.deleted` and `schedule.executed`.
+
+The newest 10,000 events are kept for each account. If your cursor is too old, the API returns **410**. Load a fresh resource snapshot and resume from its cursor. [Home Assistant snapshots](/v1/home-assistant) provide both together.
+

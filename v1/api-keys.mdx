@@ -1,0 +1,77 @@
+---
+title: "API Keys"
+sidebarTitle: "API Keys"
+description: "Create a key and give your app access to the API."
+---
+
+An API key lets your app read or change AlexWeb data. Each key has permissions called **scopes**.
+
+Get your first key privately from the API owner. Never put it in a public website or a URL.
+
+## Try it
+
+Replace `YOUR_API_KEY` with your key to check that it works.
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/auth/me -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## What you'll see
+
+```json
+{
+  "account": { "id": "ACCOUNT_ID", "name": "AlexWeb" },
+  "credential": {
+    "id": "KEY_ID",
+    "kind": "api_key",
+    "scopes": ["resources:read", "events:read"]
+  },
+  "api": { "name": "AlexWeb API", "version": "1.1.0" }
+}
+```
+
+- **scopes** lists what this key can do.
+- **id** identifies the key without showing its secret value.
+
+You can also send an API key with `X-API-Key: YOUR_API_KEY`.
+
+## Create a key
+
+Your current key needs `keys:manage`. The new key can only receive permissions your current key already has.
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/keys -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"name":"My app","scopes":["resources:read","events:read"],"expiresInDays":90}'
+```
+
+</CodeGroup>
+
+Save the response's **key** privately. It is shown once. `expiresInDays` is optional and defaults to 90 days; it accepts 1–365. A new key cannot outlive the credential creating it.
+
+## Other requests
+
+| Request | What it does | Required scope |
+| --- | --- | --- |
+| `GET /api/v1/auth/me` | Checks your key or OAuth token. | Any valid credential |
+| `GET /api/v1/keys` | Lists key names, permissions and expiry dates. | `keys:manage` |
+| `POST /api/v1/keys` | Creates a key. | `keys:manage` |
+| `DELETE /api/v1/keys/{id}` | Revokes a key immediately. | `keys:manage` |
+
+## Permissions
+
+| Scope | Allows |
+| --- | --- |
+| `resources:read` / `resources:write` | Read / change resources. |
+| `events:read` / `events:write` | Read events, including full resource changes / publish custom events. |
+| `integrations:read` | Read Home Assistant integration information. |
+| `webhooks:manage` | Manage event webhooks. |
+| `schedules:manage` | Manage schedules. |
+| `usage:read` | Read usage and audit history. |
+| `keys:manage` / `apps:manage` | Manage keys / registered applications. |
+
+Missing or invalid keys return **401**. Missing permissions return **403**.

@@ -1,0 +1,77 @@
+---
+title: "Resources"
+sidebarTitle: "Resources"
+description: "Store a sensor, switch or other value in AlexWeb."
+---
+
+A resource is a named piece of data, such as a temperature, a switch or a text value.
+
+Reading needs `resources:read`. Creating, updating or deleting needs `resources:write`.
+
+## Try it
+
+Create a temperature sensor:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/resources -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"name":"Office temperature","type":"sensor","state":22.5,"attributes":{"unit_of_measurement":"°C"},"tags":["office"]}'
+```
+
+</CodeGroup>
+
+## What you'll see
+
+```json
+{
+  "id": "RESOURCE_ID",
+  "name": "Office temperature",
+  "type": "sensor",
+  "state": 22.5,
+  "attributes": { "unit_of_measurement": "°C" },
+  "tags": ["office"],
+  "version": 1,
+  "createdAt": "2026-10-17T12:00:00.000Z",
+  "updatedAt": "2026-10-17T12:00:00.000Z"
+}
+```
+
+- **id** stays the same when the value changes.
+- **state** is the current value.
+- **attributes** adds details such as the unit.
+- **version** increases after each update.
+
+## Resource types
+
+| Type | State value | Example |
+| --- | --- | --- |
+| `sensor` | Number or text | `22.5` |
+| `binary_sensor` | `true` or `false` | A door is open. |
+| `switch` | `true` or `false` | A switch is on. |
+| `text` | Text | `"Ready"` |
+
+## Update a value
+
+Replace `RESOURCE_ID` with the ID from the response. `PATCH` changes only the fields you send.
+
+<CodeGroup>
+
+```powershell CURL
+curl -X PATCH https://api.alexxweb.com/api/v1/resources/RESOURCE_ID -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"state":23}'
+```
+
+</CodeGroup>
+
+To avoid overwriting a newer edit, also send `If-Match: "1"` using the version you last read. An outdated version returns **412**.
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/resources` | Lists resources; optionally filter by `type` or `tag`. |
+| `GET /api/v1/resources/{id}` | Reads one resource. |
+| `PATCH /api/v1/resources/{id}` | Updates its name, state, attributes or tags. |
+| `DELETE /api/v1/resources/{id}` | Deletes it. |
+
+Lists accept `limit` and `offset`. Resource changes also create [events](/v1/events).
+

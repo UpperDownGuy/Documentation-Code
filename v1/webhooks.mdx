@@ -1,0 +1,61 @@
+---
+title: "Webhooks"
+sidebarTitle: "Webhooks"
+description: "Have the API send events to your app."
+---
+
+A webhook sends an HTTP request to your app when a matching event happens. Your app needs a public HTTPS endpoint to receive it.
+
+Every request on this page needs `webhooks:manage`. Creating, editing or re-enabling a webhook also needs `events:read`, because event payloads include resource data.
+
+## Try it
+
+Replace the URL with your receiver's address:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/webhooks -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"name":"My receiver","url":"https://example.com/alexweb-events","events":["resource.updated","custom.*"],"enabled":true}'
+```
+
+</CodeGroup>
+
+## What you'll see
+
+The response includes the webhook's **id**, **url**, **events**, **enabled** state and a **secret** for checking signatures.
+
+- **events** selects the changes to receive. Use an exact type, or `custom.*` for all custom events.
+- **enabled** lets you pause delivery.
+- **secret** is shown once. Save it privately on your receiver.
+
+## Receiving events
+
+The API sends a JSON event with an **id**, **type**, **data** and **createdAt**. Your receiver should check the signature, save the event, then return a successful HTTP status promptly.
+
+`X-AlexWeb-Signature` has this format:
+
+```text
+t=UNIX_SECONDS,v1=HEX_SIGNATURE
+```
+
+To check it, calculate HMAC SHA-256 using your webhook secret over the timestamp, a dot, and the **unchanged raw request body**. Compare the hex signature safely and reject old timestamps. Do this before acting on an event.
+
+Use `X-AlexWeb-Event-Id` and `X-AlexWeb-Delivery-Id` to avoid processing a retry twice. Failed deliveries are retried with increasing delays, up to five attempts.
+
+Delivery stops when the credential that authorized the webhook is revoked or expires. For OAuth, the connection's grant lifetime applies; the short access-token expiry does not stop delivery.
+
+Each webhook can queue 1,000 pending deliveries. If the receiver stays unavailable for a long time, older events can expire from the 10,000-event history. Check [audit history](/v1/usage) for `webhook.queue_full`, `webhook.queue_resumed` or `webhook.event_gap`, and reload current resources if a gap occurs. Delivery history keeps the latest 500 completed deliveries.
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/webhooks` | Lists webhooks. |
+| `GET /api/v1/webhooks/{id}` | Reads one webhook. |
+| `PATCH /api/v1/webhooks/{id}` | Changes its URL, event filters or enabled state. |
+| `DELETE /api/v1/webhooks/{id}` | Deletes it. |
+| `GET /api/v1/webhooks/{id}/deliveries` | Lists delivery attempts and results. |
+| `POST /api/v1/webhooks/{id}/rotate-secret` | Replaces its signing secret. |
+
+Use HTTPS on port 443. Local, private and reserved network destinations are rejected, and redirects are not followed. Use [event polling or streaming](/v1/events) when your app does not have a public receiver.
+

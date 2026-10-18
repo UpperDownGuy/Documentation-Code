@@ -1,0 +1,44 @@
+---
+title: "Applications"
+sidebarTitle: "Applications"
+description: "Register an app before connecting it with OAuth."
+---
+
+Register an application when it needs to connect using [OAuth](/v1/oauth). Registration gives it a **client ID**.
+
+Your API key needs `apps:manage` for every request on this page.
+
+## Try it
+
+This example registers a public app. Replace the callback URL with your app's own sign-in callback.
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/apps -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"name":"My app","type":"public","redirectUris":["https://example.com/callback"],"scopes":["resources:read","events:read","integrations:read"]}'
+```
+
+</CodeGroup>
+
+## What you'll see
+
+The response includes **id**, **clientId**, **name**, **type**, **redirectUris** and **scopes**.
+
+- **Public** apps run on a phone or in a browser and do not have a client secret.
+- **Confidential** apps run on a trusted server. Set `type` to `confidential`; save the returned **clientSecret** privately because it is shown once.
+
+The callback must match a registered URL exactly. Use HTTPS; HTTP is allowed only for a localhost callback. Wildcards and URL fragments are not supported.
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/apps` | Lists registered apps. |
+| `GET /api/v1/apps/{id}` | Reads one app. |
+| `PATCH /api/v1/apps/{id}` | Changes its name, callbacks or scopes. |
+| `DELETE /api/v1/apps/{id}` | Deletes the app and its access. |
+| `POST /api/v1/apps/{id}/rotate-secret` | Replaces a confidential app's secret. |
+
+Changing an app's callbacks or permissions, rotating its secret, or deleting it removes its previous OAuth access. Connect the app again afterward.
+
+Apps cannot request `keys:manage` or `apps:manage`. Give each app only the permissions it needs.

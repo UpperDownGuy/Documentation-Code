@@ -25,7 +25,7 @@ You do not need to log in or provide an API key.
 ```json
 {
   "name": "AlexWeb API",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
 ```
 
@@ -33,3 +33,13 @@ You do not need to log in or provide an API key.
 - **version** is the current API version.
 
 This request only reads information. It does not change anything.
+
+## Other useful requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /health` | Checks whether the API is running. |
+| `GET /api/v1/capabilities` | Lists available API features and limits. |
+| `GET /openapi.json` | Downloads the full API specification. |
+
+These requests are public. To manage data, use an [API key](/v1/api-keys) or an [OAuth token](/v1/oauth).

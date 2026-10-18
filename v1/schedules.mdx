@@ -1,0 +1,62 @@
+---
+title: "Schedules"
+sidebarTitle: "Schedules"
+description: "Publish an event or update a resource later."
+---
+
+A schedule runs a built-in action once at a chosen time or repeatedly at an interval.
+
+Every request on this page needs `schedules:manage`. Creating or editing a schedule also needs `events:write` for an event action, or `resources:write` for a resource action.
+
+## Try it
+
+This example publishes a reminder every hour:
+
+<CodeGroup>
+
+```powershell CURL
+curl https://api.alexxweb.com/api/v1/schedules -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"name":"Hourly reminder","intervalSeconds":3600,"action":{"type":"event.publish","eventType":"custom.reminder","data":{"message":"Check the office"}}}'
+```
+
+</CodeGroup>
+
+## What you'll see
+
+The response includes **id**, **name**, **enabled**, **action** and the next run time.
+
+- **intervalSeconds** repeats every 60 seconds to one year.
+- **runAt** schedules one future time instead. Use an ISO timestamp with a timezone, such as `2027-01-01T09:00:00-05:00`.
+- **enabled** is `true` by default. Set it to `false` to pause.
+
+Choose `runAt` or `intervalSeconds`, not both. Run history is included when you read a schedule.
+
+## Available actions
+
+| Action | Fields | What it does |
+| --- | --- | --- |
+| `event.publish` | `eventType`, `data` | Publishes an event whose type starts with `custom.`. |
+| `resource.set_state` | `resourceId`, `state` | Updates an existing resource's state. |
+
+For example, this action turns an AlexWeb switch on:
+
+```json
+{
+  "type": "resource.set_state",
+  "resourceId": "RESOURCE_ID",
+  "state": true
+}
+```
+
+## Other requests
+
+| Request | What it does |
+| --- | --- |
+| `GET /api/v1/schedules` | Lists schedules. |
+| `GET /api/v1/schedules/{id}` | Reads a schedule and its run history. |
+| `PATCH /api/v1/schedules/{id}` | Changes its timing, action or enabled state. |
+| `DELETE /api/v1/schedules/{id}` | Deletes it. |
+
+A completed run creates a `schedule.executed` [event](/v1/events). Schedules survive restarts. After downtime, a repeating schedule runs once and moves to its next interval instead of replaying every missed run.
+
+Actions stop when the credential that authorized the schedule is revoked or expires. For OAuth, the connection's grant lifetime applies.
+
