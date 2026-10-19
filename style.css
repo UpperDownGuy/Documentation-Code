@@ -19,7 +19,7 @@
 }
 
 /* Sidebar page links as buttons */
-#sidebar-content li a {
+#sidebar-content #navigation-items li > a[href] {
   display: flex !important;
   align-items: center;
   margin: 0.25rem 0 !important;
@@ -29,8 +29,6 @@
   background-color: rgba(0, 135, 209, 0.05) !important;
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-
-/* AlexWeb documentation navbar logo */
 
 /* Let the search label shrink without pushing its shortcut out of the bar. */
 #sidebar #search-bar-entry > div {
@@ -42,98 +40,57 @@
   flex-shrink: 0;
 }
 
-/* ===================================
-   ALEXWEB DOCUMENTATION - NAVBAR
-   =================================== */
-
-/* Enlarge navbar logo */
+/* Keep the logo proportional and within the available header space. */
 img.nav-logo {
-  height: 44px !important;
-  max-height: 44px !important;
-  max-width: 260px !important;
+  height: auto !important;
+  max-height: 2.75rem !important;
+  max-width: min(16.25rem, 100%) !important;
   width: auto !important;
   padding: 0 !important;
   object-fit: contain !important;
 }
 
-/* Keep the desktop theme control above the sidebar's natural footer.
-   Reserving space in the scroll area prevents links from passing behind it. */
-@media (min-width: 1024px) {
-  #sidebar-content {
-    position: relative;
-  }
-
-  #sidebar-content > [data-component-part="scroll-area-viewport"] {
-    height: calc(100% - 60px) !important;
-  }
-
-  [data-theme-preference-switch="pill"] {
-    position: absolute !important;
-
-    /* The containing block ends where the footer links begin. */
-    left: 7px !important;
-    bottom: 8px !important;
-
-    width: calc(100% - 14px) !important;
-    box-sizing: border-box !important;
-    height: 44px !important;
-    max-width: none !important;
-
-    transform: none !important;
-    padding: 4px !important;
-    border-radius: 10px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-around !important;
-    z-index: 50 !important;
-  }
-
-  [data-theme-preference-switch="pill"] button {
-    flex: 1 1 0% !important;
-    width: auto !important;
-    height: 36px !important;
-    border-radius: 8px !important;
-  }
+/* Let the theme control wrap below the logo in the normal scroll flow. */
+:is(#sidebar-content, #mobile-nav) div:has(> [data-theme-preference-switch="pill"]) {
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-
-
-/* Mobile: leave theme selector
-   in its normal location */
-@media (max-width: 1023px) {
-  [data-theme-preference-switch="pill"] {
-    position: relative !important;
-  }
+:is(#sidebar-content, #mobile-nav) a:has(> img.nav-logo) {
+  min-width: 0;
+  max-width: 100%;
 }
 
-
-/* Increase the navbar logo size */
-#navbar img {
-  height: 48px !important;
-  max-height: 48px !important;
-  width: auto !important;
-  max-width: none !important;
-  object-fit: contain;
+:is(#sidebar-content, #mobile-nav) [data-theme-preference-switch="pill"] {
+  flex-shrink: 0;
 }
 
+#navbar img.nav-logo {
+  max-width: min(16.25rem, 50vw) !important;
+}
 
-#sidebar-content li a:hover {
+#sidebar-content #navigation-items li > a[href]:hover {
   background-color: rgba(0, 135, 209, 0.12) !important;
   border-color: rgba(0, 135, 209, 0.4) !important;
   transform: translateX(2px);
 }
 
-/* Current page */
-#sidebar-content li[data-active] a {
+/* Highlight only the current page, not every link in its parent group. */
+#sidebar-content #navigation-items li > a[aria-current="page"],
+#sidebar-content #navigation-items li[data-active-nav-item="true"] > a[href] {
   background-color: #0087D1 !important;
   border-color: #0087D1 !important;
   color: #ffffff !important;
   font-weight: 600;
 }
 
-#sidebar-content li[data-active] a * {
+#sidebar-content #navigation-items li > a[aria-current="page"] *,
+#sidebar-content #navigation-items li[data-active-nav-item="true"] > a[href] * {
   color: #ffffff !important;
+}
+
+#sidebar-content #navigation-items li > a[aria-current="page"] svg[style*="mask-image"] {
+  background-color: currentColor !important;
 }
 
 /* Previous / next links at the bottom of pages as buttons */
@@ -244,6 +201,6 @@ img.nav-logo {
   .aw-doc-hero { border-radius: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .aw-doc-button, #sidebar-content li a { transition: none !important; transform: none !important; }
+  .aw-doc-button, #sidebar-content #navigation-items li > a[href] { transition: none !important; transform: none !important; }
 }
 
