@@ -1,0 +1,127 @@
+---
+title: "Install HA Link"
+sidebarTitle: "Install"
+description: "Install, update, back up, and remove HA Link using Bash on Home Assistant OS."
+icon:
+  name: "download"
+  library: "lucide"
+---
+
+Install HA Link from the complete **ha-link-0.1.0.zip** bundle supplied with the project. This guide uses the Home Assistant OS Terminal & SSH app and the configuration directory at `/config`.
+
+## Before you start
+
+- Run **Home Assistant Core 2026.10.0 or newer**.
+- Create a Home Assistant backup before changing custom integrations.
+- Install and start a terminal app from **Settings → Apps**, then open its terminal.
+- Transfer the complete extracted project into `/config/ha-link`, for example using the Samba share app. You should see `install.sh`, `uninstall.sh`, and `custom_components/ha_link/manifest.json`.
+
+<Note>
+  The integration is installed inside Home Assistant's configuration directory. Run these commands in the terminal app, not in the restricted Home Assistant OS host console. No host package upgrade or curl bootstrap is required.
+</Note>
+
+<Danger>
+  This tutorial requires you to be an administrator in your Home Assistant instance.
+</Danger>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Go to [Terminal & SSH Addon](http://my.home-assistant.io/redirect/supervisor_addon/?addon=core_ssh) ">
+  </Step>
+  <Step title="Set your Home Assistant URL">
+    On the webpage, choose the URL text box, and enter your home assistant instance URL. This is the URL you use to access your instance.
+  </Step>
+  <Step title="Confirm">
+    When your URL is entered, click the save or change button. 
+
+    Once done, press open link.
+  </Step>
+  <Step title="Install Addon">
+    Once you login to your instance, or when you are on the addon page, click install.
+
+    This will take around 2 minutes to install.
+
+    <Warning>
+      If the installation does not do anything, refresh and press the install button again, if that does nothing, restart your Home Assistant instance by going to Settings > Tools > Restart > Restart Home Assistant then confirm the restart by pressing Restart.
+
+      After your instance boots up again, go back to the addon page by clicking [here](http://my.home-assistant.io/redirect/supervisor_addon/?addon=core_ssh). Then follow steps 1-3.
+    </Warning>
+  </Step>
+  <Step title="Setup & Start the Addon">
+    On the addon page, enable Show In Sidebar, and Auto Update.
+
+    Then go to the configuration tab.<br />Click on the + button that says Packages, then in the input box, type in curl, then press enter.
+
+    Go back to the info tab.
+
+    Then press Start, and wait. If it takes a long time, just refresh.
+  </Step>
+  <Step title="Open It">
+    Press the Open Web UI button on the addon page.
+  </Step>
+  <Step title="Download the installer">
+    ```shellscript
+    #!/usr/bin/env bash
+    set -Eeuo pipefail
+    
+    INSTALL_URL="https://api.alexxweb.com/v1/install/r5xYzPhI6cWypO9P1iBB45JDDq0kc6uNj8TGGb_zOmY"
+    WORK_DIR="$(mktemp -d)"
+    
+    trap 'rm -rf "$WORK_DIR"' EXIT
+    
+    echo "================================"
+    echo "       HA Linker Installer"
+    echo "================================"
+    
+    echo "[1/6] Installing dependencies..."
+    apk add --no-cache curl unzip
+    
+    echo "[2/6] Downloading HA Linker..."
+    curl --fail --location --show-error \
+        "$INSTALL_URL" \
+        --output "$WORK_DIR/halinker.zip"
+    
+    echo "[3/6] Extracting..."
+    unzip -q "$WORK_DIR/halinker.zip" -d "$WORK_DIR"
+    
+    echo "[4/6] Running installer..."
+    cd "$WORK_DIR/ha-link"
+    
+    if [ ! -f install.sh ]; then
+        echo "ERROR: install.sh not found!"
+        exit 1
+    fi
+    
+    chmod +x install.sh
+    ./install.sh
+    
+    echo "[5/6] Installation completed!"
+    echo "[6/6] Checking Home Assistant..."
+    
+    if command -v ha >/dev/null 2>&1; then
+        ha core check
+    
+        echo "Restarting Home Assistant..."
+        ha core restart
+    else
+        echo "Home Assistant CLI not available."
+        echo "Restart Home Assistant manually."
+    fi
+    
+    echo "HA Linker installation finished!"
+    
+    ```
+
+    This will download and run the installer
+  </Step>
+  <Step title="Wait">
+    Wait for the installer to finish, then it will restart Home Assistant. This will take about 3-10 min depending on your instance.
+  </Step>
+  <Step title="Setup the integration">
+    Go to Settings > Devices & Services > + Add Integration > HA Link.
+
+    Continue setup [here.](https://wiki.alexxweb.com/integration-onboarding)
+  </Step>
+</Steps>
+

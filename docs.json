@@ -78,21 +78,49 @@
                     "group": "Usage",
                     "pages": [
                       "ha-link/usage/homepage",
-                      "ha-link/usage/connection-routes",
-                      "ha-link/usage/entities",
-                      "ha-link/usage/controls",
-                      "ha-link/usage/configure",
-                      "ha-link/usage/integrations",
-                      "ha-link/usage/device-page",
-                      "ha-link/usage/alexa",
-                      "ha-link/usage/google-home",
-                      "ha-link/usage/google-nest",
-                      "ha-link/usage/homekit",
-                      "ha-link/usage/matter",
-                      "ha-link/usage/dashboards",
-                      "ha-link/usage/automations",
-                      "ha-link/usage/diagnostics",
-                      "ha-link/usage/troubleshooting"
+                      {
+                        "group": "Using HA Link",
+                        "icon": "layout-dashboard",
+                        "expanded": false,
+                        "pages": [
+                          "ha-link/usage/connection-routes",
+                          "ha-link/usage/entities",
+                          "ha-link/usage/controls",
+                          "ha-link/usage/configure"
+                        ]
+                      },
+                      {
+                        "group": "Connections",
+                        "icon": "plug",
+                        "expanded": false,
+                        "pages": [
+                          "ha-link/usage/alexa",
+                          "ha-link/usage/google-home",
+                          "ha-link/usage/google-nest",
+                          "ha-link/usage/homekit",
+                          "ha-link/usage/matter"
+                        ]
+                      },
+                      {
+                        "group": "Home Assistant pages",
+                        "icon": "house",
+                        "expanded": false,
+                        "pages": [
+                          "ha-link/usage/integrations",
+                          "ha-link/usage/device-page",
+                          "ha-link/usage/dashboards",
+                          "ha-link/usage/automations"
+                        ]
+                      },
+                      {
+                        "group": "Help",
+                        "icon": "circle-help",
+                        "expanded": false,
+                        "pages": [
+                          "ha-link/usage/diagnostics",
+                          "ha-link/usage/troubleshooting"
+                        ]
+                      }
                     ]
                   }
                 ]
@@ -164,6 +192,6 @@
     }
   },
   "search": {
-    "prompt": "Search requests, setup, and examples..."
+    "prompt": "Search docs..."
   }
 }
