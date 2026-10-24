@@ -1,0 +1,87 @@
+---
+title: "AlexWeb documentation"
+sidebarTitle: "Overview"
+description: "Build with the AlexWeb API and connect your smart home with HA Link."
+icon: "compass"
+---
+
+<div className="aw-doc-hero aw-doc-hero-overview">
+  <span className="aw-doc-eyebrow">AlexWeb developer platform</span>
+  <p className="aw-doc-hero-title">Your data. More connected.</p>
+  <p className="aw-doc-hero-copy">Build apps around your data, react to changes in real time, and bring everything together in Home Assistant.</p>
+
+  <div className="aw-doc-actions">
+    <a className="aw-doc-button aw-doc-button-primary" href="/v1/developer-accounts">Start building <span aria-hidden="true">→</span></a>
+    <a className="aw-doc-button" href="/v1/base">Try your first request</a>
+  </div>
+
+  <div className="aw-doc-hero-meta">
+    <span>API v1</span><span>Interactive examples</span><span>Home Assistant integration</span>
+  </div>
+</div>
+
+## Choose your starting point
+
+<CardGroup cols={2}>
+  <Card title="Build with the API" icon="code" href="/v1/base" arrow>
+    Start with a public request, then use your own account to store resources and connect apps.
+  </Card>
+
+  <Card title="Set up HA Link" icon="house-plug" href="/ha-link/overview" arrow>
+    Install HA Link, choose your connections, and find your devices in Home Assistant.
+  </Card>
+</CardGroup>
+
+## From an idea to your first integration
+
+<Steps>
+  <Step title="Create your developer account" icon="user-round">
+    Open the [developer console](https://api.alexxweb.com/developers) and create a separate account for your apps, credentials, and data. Follow the [account guide](/v1/developer-accounts).
+  </Step>
+  <Step title="Give your app access" icon="key">
+    Create an [API key](/v1/api-keys) with the permissions your app needs, or connect another user's account through [OAuth](/v1/oauth).
+  </Step>
+  <Step title="Build something useful" icon="blocks">
+    [Store a resource](/v1/resources), listen for [events](/v1/events), or connect your data to [Home Assistant](/v1/home-assistant).
+  </Step>
+</Steps>
+
+## Explore the platform
+
+<CardGroup cols={2}>
+  <Card title="Resources" icon="database" href="/v1/resources" arrow>
+    Store named values and read or update them from your apps.
+  </Card>
+
+  <Card title="Live events" icon="radio" href="/v1/events" arrow>
+    Read event history and respond to changes as they happen.
+  </Card>
+
+  <Card title="Webhooks" icon="webhook" href="/v1/webhooks" arrow>
+    Deliver signed event notifications to your own service.
+  </Card>
+
+  <Card title="Scheduled actions" icon="calendar-clock" href="/v1/schedules" arrow>
+    Run actions at the times your app needs them.
+  </Card>
+</CardGroup>
+
+<Tip>
+  New to the API? The [Base API](/v1/base) is public, so you can make your first request without an account.
+</Tip>
+
+## Keep building
+
+<CardGroup cols={3}>
+  <Card title="Service status" icon="activity" href="/v1/status">
+    Check availability and readiness.
+  </Card>
+
+  <Card title="Usage & limits" icon="chart-no-axes-combined" href="/v1/usage">
+    Understand quotas and request traffic.
+  </Card>
+
+  <Card title="What's new" icon="sparkles" href="/v1/release">
+    Explore the latest API updates.
+  </Card>
+</CardGroup>
