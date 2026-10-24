@@ -15,34 +15,43 @@ icon: "users"
   </div>
 </div>
 
-Anyone can read AlexWeb's public service information. A developer account gives you a private area for your own resources, events, API keys, OAuth applications, webhooks, schedules, and usage history.
+<div className="aw-doc-intro">
+  <span className="aw-doc-label">Your private area</span>
+  <p>Anyone can read AlexWeb's public service information. A developer account gives you a private area for your own resources, events, API keys, OAuth applications, webhooks, schedules, and usage history.</p>
+</div>
 
 The **developer console** is the website for managing that access. Your apps connect to the API using an API key or OAuth token. They do not need your console password.
 
 ## Create an account
 
 <Steps>
-  <Step title="Open the console">
+  <Step title="Open the console" icon="globe">
     Visit [api.alexxweb.com/developers](https://api.alexxweb.com/developers) and choose the account creation option.
   </Step>
-  <Step title="Choose a username and password">
-    Use a username with 3–32 letters, digits, underscores, or hyphens. Usernames are case-insensitive: `MyApp` and `myapp` refer to the same username. Choose a password between 12 and 128 characters. A display name is optional, and no email address is required.
+  <Step title="Choose a username and password" icon="user-round">
+    | Field | Requirements |
+    | --- | --- |
+    | **Username** | 3 to 32 letters, digits, underscores, or hyphens. Case-insensitive: `MyApp` and `myapp` refer to the same username. |
+    | **Password** | Between 12 and 128 characters. |
+    | **Display name** | Optional. |
+
+    No email address is required.
   </Step>
-  <Step title="Create a key for your app">
+  <Step title="Create a key for your app" icon="key">
     After signing in, open API key management. Give the key a recognizable name, select its permissions and expiry, then save the returned secret privately. See [API Keys](/v1/api-keys) for the available permissions.
   </Step>
-  <Step title="Make your first request">
+  <Step title="Make your first request" icon="rocket">
     Use the key to check your identity, then [create a resource](/v1/resources). Your new account starts with its own data; examples in the docs do not create resources until you send them.
   </Step>
 </Steps>
 
-If the username is already used, choose another one. Registration may return **503** when new account creation is unavailable or the service's account capacity has been reached. That does not give you access to an existing account.
+<Note>
+  If the username is already used, choose another one. Registration may return **503** when new account creation is unavailable or the service's account capacity has been reached. That does not give you access to an existing account.
+</Note>
 
 ## Sign in later
 
-Open the console and enter the same username and password. A successful login opens a browser session lasting up to **12 hours**. When it expires, sign in again. The account supports up to ten browser sessions; starting another session after reaching that number ends the oldest one.
-
-The console also supports connecting with an existing API key. This is useful for an existing account or for a key that has access to only part of an account. The console's available operations follow that credential's permissions: a read-only key does not become a management key simply because you use it in a browser.
+There are two ways to use the console:
 
 <CardGroup cols={2}>
   <Card title="Developer account login" icon="user-round">
@@ -53,17 +62,43 @@ The console also supports connecting with an existing API key. This is useful fo
   </Card>
 </CardGroup>
 
+**Username and password.** A successful login opens a browser session lasting up to **12 hours**. When it expires, sign in again. The account supports up to **ten browser sessions**; starting another session after reaching that number ends the oldest one.
+
+**Existing API key.** This is useful for an existing account or for a key that has access to only part of an account. The console's available operations follow that credential's permissions.
+
+<Info>
+  A read-only key does not become a management key simply because you use it in a browser.
+</Info>
+
 ## What you can manage
 
-| Console area | What you can do |
-| --- | --- |
-| **API keys** | Create a separate key for each app, inspect permissions and expiry, rotate a key, or revoke it. |
-| **OAuth applications** | Register an application, view its client identity, replace a confidential app's secret, or delete it. |
-| **Usage** | Review request traffic, response status, errors, and server response times. |
-| **Service status** | Check public readiness, uptime, and a browser response-time measurement. |
-| **Account settings** | Change your password and end your current browser session. |
+<div className="aw-doc-link-grid">
+  <CardGroup cols={2}>
+    <Card title="API keys" icon="key" href="/v1/api-keys">
+      Create a separate key for each app, inspect permissions and expiry, rotate a key, or revoke it.
+    </Card>
 
-Creating or rotating a secret shows the new value once. A list of keys or applications shows their identifiers and metadata; it cannot reveal an existing secret.
+    <Card title="OAuth applications" icon="workflow" href="/v1/applications">
+      Register an application, view its client identity, replace a confidential app's secret, or delete it.
+    </Card>
+
+    <Card title="Usage" icon="activity" href="/v1/usage">
+      Review request traffic, response status, errors, and server response times.
+    </Card>
+
+    <Card title="Service status" icon="heart-pulse" href="/v1/status">
+      Check public readiness, uptime, and a browser response-time measurement.
+    </Card>
+
+    <Card title="Account settings" icon="wrench" href="#change-your-password">
+      Change your password and end your current browser session.
+    </Card>
+  </CardGroup>
+</div>
+
+<Warning>
+  Creating or rotating a secret shows the new value **once**. A list of keys or applications shows their identifiers and metadata; it cannot reveal an existing secret.
+</Warning>
 
 ## Keep your apps separate
 
@@ -79,15 +114,31 @@ Use a dedicated key for each app or integration. For example:
 | Home Assistant with sensors only | `resources:read`, `events:read`, `integrations:read` |
 | Home Assistant with switch and text controls | The three Home Assistant read scopes, plus `resources:write` |
 
-Management permissions such as `keys:manage` and `apps:manage` allow changes to credentials and registered applications. Give them to tools that need to manage access.
+<Tip>
+  Management permissions such as `keys:manage` and `apps:manage` allow changes to credentials and registered applications. Give them only to tools that need to manage access.
+</Tip>
 
 ## Understand your allowance
 
-New developer accounts have an allowance of **10,000 authenticated API requests per day**, shared across the account's credentials. Creating another key does not create another daily allowance.
+<CardGroup cols={3}>
+  <Card title="10,000 / day" icon="calendar">
+    Authenticated API requests per account, shared across all of its credentials. Resets at **midnight UTC**.
+  </Card>
 
-The daily allowance resets at **midnight UTC**. Each API credential also has a **120 request per minute** limit. Public requests have a separate **60 request per minute per IP address** limit; the legacy `/health` liveness route is exempt. Use [Usage & Limits](/v1/usage) for response headers and retry behavior.
+  <Card title="120 / minute" icon="key">
+    Requests per API credential.
+  </Card>
 
-An API response with HTTP **429** means a request allowance has been reached. Follow `Retry-After` instead of retrying continuously. A larger number of keys does not bypass the account allowance.
+  <Card title="60 / minute" icon="globe">
+    Public requests per IP address. The legacy `/health` liveness route is exempt.
+  </Card>
+</CardGroup>
+
+Creating another key does not create another daily allowance, and a larger number of keys does not bypass the account allowance. See [Usage & Limits](/v1/usage) for response headers and retry behavior.
+
+<Warning>
+  An API response with HTTP **429** means a request allowance has been reached. Follow `Retry-After` instead of retrying continuously.
+</Warning>
 
 The console's usage view shows recorded requests for your account. Those statistics are useful for deciding whether your app should cache a value, poll less often, or use [events](/v1/events) to react to changes.
 
@@ -95,19 +146,35 @@ The console's usage view shows recorded requests for your account. Those statist
 
 Use the password change form in account settings. Enter your current password and a new password between 12 and 128 characters. A successful change ends your other browser sessions, so other browsers need to sign in again.
 
-There is currently no email-based password reset flow. Store your password in a password manager so you can retrieve it later. API keys and client secrets are separate credentials; manage their access in the keys and applications areas.
+<Warning>
+  There is currently no email-based password reset flow. Store your password in a password manager so you can retrieve it later.
+</Warning>
+
+API keys and client secrets are separate credentials; manage their access in the keys and applications areas.
 
 ## Sign out
 
 Use **Sign out** in the console to end the current browser session. Closing a tab alone does not immediately expire a browser session. On a shared computer, sign out before leaving it.
 
-An API key copied into an app remains usable until it expires, is rotated, or is revoked. Signing out of the console does not replace the need to revoke an app's key when you want to remove that app's access.
+<Note>
+  An API key copied into an app remains usable until it expires, is rotated, or is revoked. Signing out of the console does not replace the need to revoke an app's key when you want to remove that app's access.
+</Note>
 
 ## Browser session security
 
-The console uses a session cookie. The hosted service marks it **HttpOnly**, **Secure**, and **SameSite=Strict**. HttpOnly means ordinary page JavaScript cannot read the session cookie; Secure restricts it to HTTPS; SameSite=Strict limits when browsers attach it to requests initiated from other sites.
+The console uses a session cookie. The hosted service marks it with these attributes:
 
-Requests that change account data also use a CSRF token and same-origin checks. The console handles these checks automatically. You do not need to copy session cookies or CSRF values into your apps. Use [API keys](/v1/api-keys) for your own service, or [OAuth](/v1/oauth) when another app should ask for permission.
+| Attribute | What it does |
+| --- | --- |
+| **HttpOnly** | Ordinary page JavaScript cannot read the session cookie. |
+| **Secure** | Restricts the cookie to HTTPS. |
+| **SameSite=Strict** | Limits when browsers attach it to requests initiated from other sites. |
+
+Requests that change account data also use a CSRF token and same-origin checks. The console handles these checks automatically.
+
+<Tip>
+  You do not need to copy session cookies or CSRF values into your apps. Use [API keys](/v1/api-keys) for your own service, or [OAuth](/v1/oauth) when another app should ask for permission.
+</Tip>
 
 ## Console API routes
 
@@ -121,9 +188,25 @@ These endpoints support the console. Signup and login accept JSON. Requests that
 | `POST /api/v1/developer/logout` | Ends the current browser session. |
 | `POST /api/v1/developer/password` | Changes the password using `currentPassword` and `newPassword`. |
 
-These are browser account-management routes. The interactive API panels elsewhere in the docs use API credentials, so they do not require your console password.
+<Info>
+  These are browser account-management routes. The interactive API panels elsewhere in the docs use API credentials, so they do not require your console password.
+</Info>
+
+## Next steps
+
+<div className="aw-doc-link-grid">
+  <CardGroup cols={2}>
+    <Card title="Create an API key" icon="key" href="/v1/api-keys">
+      Choose permissions and expiry for each app.
+    </Card>
+
+    <Card title="Build with resources" icon="database" href="/v1/resources">
+      Store a value and read it from your apps.
+    </Card>
+  </CardGroup>
+</div>
 
 <div className="aw-doc-actions">
   <a className="aw-doc-button aw-doc-button-primary" href="https://api.alexxweb.com/developers">Create or manage an account</a>
-  <a className="aw-doc-button" href="/v1/resources">Build with resources</a>
+  <a className="aw-doc-button" href="/v1/oauth">Connect apps with OAuth</a>
 </div>
